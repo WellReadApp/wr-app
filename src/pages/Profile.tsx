@@ -1,165 +1,118 @@
-import React, { useState } from 'react';
-import { AppBar } from '../components/Layout/AppBar';
-import { BottomNavigation } from '../components/Layout/BottomNavigation';
-import { StatItem } from '../components/StatItem';
-import { books, userProfile } from '../utils/mockData';
-import { FlameIcon, TrophyIcon, BookOpenIcon, TicketIcon, BookmarkIcon, GiftIcon } from 'lucide-react';
-export const Profile: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('reading-list');
-  return <div className="min-h-screen bg-background pb-16">
-      <AppBar title="Profile" />
-      <div className="p-6 flex flex-col items-center">
-        <div className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center text-2xl font-bold mb-3">
-          {userProfile.name.split(' ').map(n => n[0]).join('')}
+import React from 'react';
+import { FlameIcon, TrophyIcon, SettingsIcon, LogOutIcon, ChevronRightIcon } from 'lucide-react';
+import { userStats } from '../utils/mockData';
+const Profile = () => {
+  return <div className="max-w-md mx-auto px-4 py-6 pb-24">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-[#333333] mb-2">Profile</h1>
+        <p className="text-gray-500">Track your progress and achievements</p>
+      </div>
+      {/* User Info */}
+      <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            JD
+          </div>
+          <div className="flex-1">
+            <h3 className="font-bold text-[#333333] text-lg">John Doe</h3>
+            <p className="text-sm text-gray-500">john.doe@email.com</p>
+          </div>
         </div>
-        <h2 className="text-xl font-semibold">{userProfile.name}</h2>
-        <p className="text-text-secondary mb-6">Member since May 2023</p>
-        <div className="flex justify-between w-full mb-8">
-          <StatItem icon={<FlameIcon size={20} className="text-accent" />} value={userProfile.streak} label="Day Streak" />
-          <StatItem icon={<TrophyIcon size={20} className="text-primary" />} value={userProfile.points} label="Points" />
-          <StatItem icon={<BookOpenIcon size={20} className="text-green-500" />} value={userProfile.booksRead} label="Books Read" />
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-[#E87968] mb-1">
+              {userStats.booksCompleted}
+            </p>
+            <p className="text-xs text-gray-500">Books</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-[#E87968] mb-1">
+              {userStats.streak}
+            </p>
+            <p className="text-xs text-gray-500">Day Streak</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-[#E87968] mb-1">
+              {Math.round(userStats.totalMinutes / 60)}h
+            </p>
+            <p className="text-xs text-gray-500">Reading Time</p>
+          </div>
         </div>
       </div>
-      <div className="border-t border-gray-200">
-        <div className="flex border-b">
-          <button className={`flex-1 py-3 text-center ${activeTab === 'reading-list' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary'}`} onClick={() => setActiveTab('reading-list')}>
-            Reading List
-          </button>
-          <button className={`flex-1 py-3 text-center ${activeTab === 'growth-plan' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary'}`} onClick={() => setActiveTab('growth-plan')}>
-            Growth Plan
-          </button>
-          <button className={`flex-1 py-3 text-center ${activeTab === 'coupons' ? 'text-primary border-b-2 border-primary' : 'text-text-secondary'}`} onClick={() => setActiveTab('coupons')}>
-            Coupons
-          </button>
-        </div>
-        <div className="p-4 mobile-scrollbar overflow-y-auto pb-20">
-          {activeTab === 'reading-list' && <div>
-              {userProfile.readingList.length > 0 ? userProfile.readingList.map(bookId => {
-            const book = books.find(b => b.id === bookId);
-            if (!book) return null;
-            return <div key={book.id} className="flex items-center p-3 border-b">
-                      <img src={book.cover} alt={book.title} className="w-12 h-16 object-cover rounded" />
-                      <div className="ml-3 flex-1">
-                        <h3 className="font-medium">{book.title}</h3>
-                        <p className="text-sm text-text-secondary">
-                          {book.author}
-                        </p>
-                      </div>
-                      <button className="text-text-secondary">
-                        <BookmarkIcon size={18} />
-                      </button>
-                    </div>;
-          }) : <div className="text-center py-10">
-                  <BookmarkIcon size={40} className="mx-auto text-gray-300 mb-3" />
-                  <p className="text-text-secondary">
-                    Your reading list is empty
-                  </p>
-                  <button className="mt-3 text-primary">Discover Books</button>
-                </div>}
-            </div>}
-          {activeTab === 'growth-plan' && <div className="py-4">
-              <h3 className="font-semibold mb-4">
-                Your Personal Growth Journey
-              </h3>
-              <div className="bg-surface rounded-lg p-4 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <span className="text-sm text-text-secondary">
-                      Current Focus
-                    </span>
-                    <h4 className="font-medium">Leadership Skills</h4>
-                  </div>
-                  <span className="text-xs bg-green-100 text-green-800 py-1 px-2 rounded">
-                    In Progress
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-xs mr-3">
-                      ✓
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Atomic Habits</p>
-                      <p className="text-xs text-text-secondary">
-                        Completed on May 15
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs mr-3">
-                      2
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Think Again</p>
-                      <p className="text-xs text-text-secondary">
-                        In progress - 75% complete
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 text-text flex items-center justify-center text-xs mr-3">
-                      3
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">Deep Work</p>
-                      <p className="text-xs text-text-secondary">
-                        Coming up next
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>}
-          {activeTab === 'coupons' && <div>
-              <div className="bg-surface rounded-lg p-4 shadow-sm mb-4">
-                <div className="flex">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mr-3">
-                    <GiftIcon size={20} className="text-accent" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">25% off any physical book</h3>
-                    <p className="text-sm text-text-secondary mb-2">
-                      Valid until June 30, 2023
-                    </p>
-                    <button className="text-xs bg-primary text-white py-1 px-3 rounded">
-                      Redeem
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-surface rounded-lg p-4 shadow-sm mb-4">
-                <div className="flex">
-                  <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center mr-3">
-                    <TicketIcon size={20} className="text-accent" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium">Free audiobook credit</h3>
-                    <p className="text-sm text-text-secondary mb-2">
-                      Redeem for any audiobook
-                    </p>
-                    <button className="text-xs bg-primary text-white py-1 px-3 rounded">
-                      Redeem
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 p-4 border border-dashed border-gray-300 rounded-lg">
-                <h3 className="font-medium mb-2">Earn More Rewards</h3>
-                <p className="text-sm text-text-secondary mb-3">
-                  Complete quizzes and maintain your reading streak to earn
-                  points for more rewards!
-                </p>
-                <div className="flex items-center">
-                  <TrophyIcon size={16} className="text-accent mr-2" />
-                  <span className="text-sm">
-                    <span className="font-medium">{userProfile.points}</span>{' '}
-                    points earned so far
-                  </span>
-                </div>
-              </div>
-            </div>}
+      {/* Streak Card */}
+      <div className="bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-2xl p-5 mb-6 shadow-lg">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
+            <FlameIcon className="text-white" size={32} fill="white" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-white font-bold text-2xl mb-1">
+              {userStats.streak} Days
+            </h3>
+            <p className="text-white/90 text-sm">
+              Keep your streak alive! Read today to continue
+            </p>
+          </div>
         </div>
       </div>
-      <BottomNavigation />
+      {/* Bonus Points */}
+      <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-bold text-[#333333] text-lg mb-1">
+              Bonus Points
+            </h3>
+            <p className="text-sm text-gray-500">
+              {userStats.pointsToNext} points to {userStats.nextMilestone}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="text-3xl font-bold text-[#E87968]">
+              {userStats.bonusPoints}
+            </p>
+          </div>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-3">
+          <div className="bg-gradient-to-r from-[#F7B8A1] to-[#E87968] rounded-full h-3 transition-all" style={{
+          width: `${userStats.bonusPoints / (userStats.bonusPoints + userStats.pointsToNext) * 100}%`
+        }} />
+        </div>
+      </div>
+      {/* Badges */}
+      <div className="mb-6">
+        <h2 className="text-lg font-bold text-[#333333] mb-4">Achievements</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {userStats.badges.map(badge => <div key={badge.id} className={`bg-white rounded-xl p-4 shadow-sm border text-center ${badge.earned ? 'border-[#E87968]' : 'border-gray-100 opacity-50'}`}>
+              <div className="text-4xl mb-2">{badge.icon}</div>
+              <p className="text-xs font-medium text-[#333333]">{badge.name}</p>
+            </div>)}
+        </div>
+      </div>
+      {/* Menu Items */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <button className="w-full flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <SettingsIcon className="text-gray-600" size={20} />
+            <span className="text-[#333333] font-medium">Settings</span>
+          </div>
+          <ChevronRightIcon className="text-gray-400" size={20} />
+        </button>
+        <button className="w-full flex items-center justify-between p-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <TrophyIcon className="text-gray-600" size={20} />
+            <span className="text-[#333333] font-medium">Achievements</span>
+          </div>
+          <ChevronRightIcon className="text-gray-400" size={20} />
+        </button>
+        <button className="w-full flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <LogOutIcon className="text-gray-600" size={20} />
+            <span className="text-[#333333] font-medium">Sign Out</span>
+          </div>
+          <ChevronRightIcon className="text-gray-400" size={20} />
+        </button>
+      </div>
     </div>;
 };
+export default Profile;

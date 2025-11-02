@@ -1,119 +1,135 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { AppBar } from '../components/Layout/AppBar';
-import { BottomNavigation } from '../components/Layout/BottomNavigation';
-import { BookCoverCard } from '../components/BookCoverCard';
-import { ProgressBar } from '../components/ProgressBar';
-import { books, growthPlan } from '../utils/mockData';
-import { FlameIcon } from 'lucide-react';
-export const Home: React.FC = () => {
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const activeTab = queryParams.get('tab') || 'home';
-  return <div className="min-h-screen bg-background pb-16">
-      <AppBar title="WellRead" showNotification={true} showProfile={true} />
-      {activeTab === 'home' ? <HomeTab /> : <PlanTab />}
-      <BottomNavigation />
-    </div>;
-};
-const HomeTab: React.FC = () => {
-  return <div className="mobile-scrollbar overflow-y-auto pb-16">
-      {/* Gamification Header Card */}
-      <div className="bg-surface m-4 p-5 rounded-xl shadow-md">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">Your Reading Streak</h3>
-            <div className="flex items-baseline mt-1">
-              <span className="text-3xl font-bold">12</span>
-              <span className="text-text-secondary ml-1">days</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-center w-12 h-12 bg-accent/10 rounded-full">
-            <FlameIcon size={24} className="text-accent" />
-          </div>
-        </div>
-        <p className="text-text-secondary mt-3">Total Points: 450</p>
+import { useNavigate } from 'react-router-dom';
+import { PlayIcon, ClockIcon, ChevronRightIcon } from 'lucide-react';
+import { mockBooks, categories, growthPlan } from '../utils/mockData';
+const Home = () => {
+  const navigate = useNavigate();
+  const continueBook = mockBooks[0];
+  return <div className="max-w-md mx-auto px-4 py-6 pb-24">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-[#333333] mb-1">Good morning</h1>
+        <p className="text-gray-500">Ready to grow today?</p>
       </div>
-      {/* Recommended for You Section */}
-      <section className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3">Recommended for You</h2>
-        <div className="flex overflow-x-auto pb-4 -mx-4 px-4 mobile-scrollbar">
-          {books.map(book => <BookCoverCard key={book.id} id={book.id} cover={book.cover} title={book.title} author={book.author} />)}
-        </div>
-      </section>
-      {/* Your Growth Plan Section */}
-      <section className="mt-6 px-4">
-        <div className="flex justify-between items-center mb-3">
-          <h2 className="text-lg font-semibold">Your Growth Plan</h2>
-          <button className="text-primary text-sm">View Full Plan</button>
-        </div>
-        <div className="bg-surface rounded-lg shadow-sm p-4">
-          <div className="flex items-center">
-            <img src={books.find(b => b.id === growthPlan[0].id)?.cover} alt="Current book" className="w-12 h-16 object-cover rounded" />
-            <div className="ml-3 flex-1">
-              <h3 className="font-medium">
-                {books.find(b => b.id === growthPlan[0].id)?.title}
-              </h3>
-              <p className="text-sm text-text-secondary">
-                {books.find(b => b.id === growthPlan[0].id)?.author}
+      {/* Continue Learning Card */}
+      <div onClick={() => navigate(`/book/${continueBook.id}`)} className="bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-2xl p-5 mb-6 shadow-lg cursor-pointer">
+        <div className="flex gap-4">
+          <img src={continueBook.cover} alt={continueBook.title} className="w-24 h-32 rounded-lg object-cover shadow-md" />
+          <div className="flex-1 flex flex-col justify-between">
+            <div>
+              <p className="text-white/90 text-xs font-medium mb-1">
+                CONTINUE LEARNING
               </p>
-              <div className="mt-2">
-                <ProgressBar progress={growthPlan[0].progress} />
-                <div className="flex justify-between text-xs mt-1">
-                  <span>{growthPlan[0].progress}% complete</span>
-                  <span>15 min left</span>
-                </div>
+              <h3 className="text-white font-bold text-lg mb-1">
+                {continueBook.title}
+              </h3>
+              <p className="text-white/90 text-sm">{continueBook.author}</p>
+            </div>
+            <div className="mt-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-white/90 text-xs font-medium">
+                  {continueBook.progress}% complete
+                </span>
               </div>
+              <div className="w-full bg-white/30 rounded-full h-2 mb-3">
+                <div className="bg-white rounded-full h-2 transition-all" style={{
+                width: `${continueBook.progress}%`
+              }} />
+              </div>
+              <button className="w-full bg-white text-[#E87968] font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 shadow-md">
+                <PlayIcon size={18} fill="currentColor" />
+                Resume Reading
+              </button>
             </div>
           </div>
         </div>
-      </section>
-      {/* Trending Now Section */}
-      <section className="mt-6 px-4">
-        <h2 className="text-lg font-semibold mb-3">Trending Now</h2>
-        <div className="flex overflow-x-auto pb-4 -mx-4 px-4 mobile-scrollbar">
-          {[...books].reverse().map(book => <BookCoverCard key={book.id} id={book.id} cover={book.cover} title={book.title} author={book.author} />)}
+      </div>
+      {/* Growth Plan Tracker */}
+      <div onClick={() => navigate('/growth-plan')} className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100 cursor-pointer">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs text-gray-500 font-medium mb-1">
+              YOUR GROWTH JOURNEY
+            </p>
+            <h3 className="text-[#333333] font-bold text-lg">
+              {growthPlan.currentMilestone}
+            </h3>
+          </div>
+          <ChevronRightIcon className="text-[#E87968]" size={24} />
         </div>
-      </section>
-    </div>;
-};
-const PlanTab: React.FC = () => {
-  return <div className="p-4 mobile-scrollbar overflow-y-auto pb-16">
-      <h2 className="text-xl font-bold mb-4">Your Personalized Growth Plan</h2>
-      <p className="text-text-secondary mb-6">
-        Follow this curated reading journey to achieve your goals.
-      </p>
-      {growthPlan.map((item, index) => {
-      const book = books.find(b => b.id === item.id);
-      return <div key={item.id} className="relative mb-8 last:mb-0">
-            {index < growthPlan.length - 1 && <div className="absolute left-6 top-16 bottom-0 w-0.5 bg-gray-200 -z-10"></div>}
-            <div className="flex">
-              <div className="flex-shrink-0 flex flex-col items-center">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${item.progress > 0 ? 'bg-accent text-white' : 'bg-gray-200'}`}>
-                  {item.progress === 100 ? <span>✓</span> : <span>{index + 1}</span>}
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-600">
+            {growthPlan.completedBooks} of {growthPlan.totalBooks} books
+          </span>
+          <span className="text-sm font-semibold text-[#E87968]">
+            {growthPlan.progress}%
+          </span>
+        </div>
+        <div className="w-full bg-gray-100 rounded-full h-3">
+          <div className="bg-gradient-to-r from-[#F7B8A1] to-[#E87968] rounded-full h-3 transition-all" style={{
+          width: `${growthPlan.progress}%`
+        }} />
+        </div>
+      </div>
+      {/* For You Section */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-[#333333]">For You</h2>
+          <button className="text-[#E87968] text-sm font-semibold">
+            See all
+          </button>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {mockBooks.slice(1).map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex-shrink-0 w-36 cursor-pointer">
+              <img src={book.cover} alt={book.title} className="w-full h-48 rounded-xl object-cover shadow-md mb-3" />
+              <h4 className="font-semibold text-sm text-[#333333] mb-1 line-clamp-2">
+                {book.title}
+              </h4>
+              <p className="text-xs text-gray-500 mb-2">{book.author}</p>
+              <div className="flex items-center gap-1 text-[#E87968]">
+                <ClockIcon size={12} />
+                <span className="text-xs font-medium">{book.readTime}</span>
+              </div>
+            </div>)}
+        </div>
+      </div>
+      {/* Categories */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-[#333333] mb-4">
+          Popular Topics
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          {categories.map(category => <button key={category} className="px-4 py-2 bg-white border border-[#F7B8A1] text-[#333333] rounded-full text-sm font-medium hover:bg-[#F7B8A1] hover:text-white transition-colors">
+              {category}
+            </button>)}
+        </div>
+      </div>
+      {/* Recently Added */}
+      <div>
+        <h2 className="text-xl font-bold text-[#333333] mb-4">
+          Recently Added
+        </h2>
+        <div className="space-y-3">
+          {mockBooks.map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex gap-3 bg-white p-3 rounded-xl shadow-sm border border-gray-100 cursor-pointer">
+              <img src={book.cover} alt={book.title} className="w-16 h-24 rounded-lg object-cover" />
+              <div className="flex-1">
+                <h4 className="font-semibold text-[#333333] mb-1">
+                  {book.title}
+                </h4>
+                <p className="text-sm text-gray-500 mb-2">{book.author}</p>
+                <div className="flex items-center gap-3 text-xs">
+                  <span className="flex items-center gap-1 text-[#E87968]">
+                    <ClockIcon size={12} />
+                    {book.readTime}
+                  </span>
+                  <span className="px-2 py-1 bg-[#F7B8A1]/20 text-[#E87968] rounded-full font-medium">
+                    {book.category}
+                  </span>
                 </div>
               </div>
-              <div className="ml-4 bg-surface p-4 rounded-lg shadow-sm flex-1">
-                <div className="flex items-center">
-                  <img src={book?.cover} alt={book?.title} className="w-12 h-16 object-cover rounded" />
-                  <div className="ml-3">
-                    <h3 className="font-medium">{book?.title}</h3>
-                    <p className="text-sm text-text-secondary">
-                      {book?.author}
-                    </p>
-                    {item.progress > 0 ? <div className="mt-2 w-full">
-                        <ProgressBar progress={item.progress} />
-                        <div className="flex justify-between text-xs mt-1">
-                          <span>{item.progress}% complete</span>
-                        </div>
-                      </div> : <button className="mt-2 text-sm text-primary">
-                        Start Reading
-                      </button>}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>;
-    })}
+            </div>)}
+        </div>
+      </div>
     </div>;
 };
+export default Home;
