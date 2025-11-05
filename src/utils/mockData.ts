@@ -85,7 +85,165 @@ export const mockBooks = [{
     }]
   },
   amazonLink: 'https://amazon.com/thinking-fast-slow'
+}, {
+  id: '4',
+  title: 'The 4-Hour Work Week',
+  author: 'Tim Ferriss',
+  cover: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=600&fit=crop',
+  category: 'Business',
+  readTime: '17 min',
+  listenTime: '21 min',
+  progress: 0,
+  rating: 4.5,
+  description: 'Escape the 9-5, live anywhere, and join the new rich.',
+  keyTakeaways: ['Eliminate the unnecessary', 'Automate your income', 'Liberate yourself from traditional work', 'Focus on effectiveness over efficiency'],
+  quotes: [{
+    text: 'Focus on being productive instead of busy.',
+    author: 'Tim Ferriss'
+  }],
+  summary: {
+    pages: [{
+      title: 'The New Rich',
+      content: 'The New Rich (NR) are those who abandon the deferred-life plan and create luxury lifestyles in the present using the currency of the New Rich: time and mobility.'
+    }]
+  },
+  amazonLink: 'https://amazon.com/4-hour-work-week'
+}, {
+  id: '5',
+  title: 'The Power of Now',
+  author: 'Eckhart Tolle',
+  cover: 'https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?w=400&h=600&fit=crop',
+  category: 'Self-Improvement',
+  readTime: '16 min',
+  listenTime: '19 min',
+  progress: 0,
+  rating: 4.7,
+  description: 'A guide to spiritual enlightenment and living in the present moment.',
+  keyTakeaways: ['The present moment is all you have', 'Your mind is an instrument, learn when to use it', 'Observe your thoughts without judgment', 'Accept the present moment'],
+  quotes: [{
+    text: 'Realize deeply that the present moment is all you have.',
+    author: 'Eckhart Tolle'
+  }],
+  summary: {
+    pages: [{
+      title: 'Being Present',
+      content: 'The moment you realize you are not present, you are present. Whenever you are able to observe your mind, you are no longer trapped in it.'
+    }]
+  },
+  amazonLink: 'https://amazon.com/power-of-now'
+}, {
+  id: '6',
+  title: 'Digital Minimalism',
+  author: 'Cal Newport',
+  cover: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=600&fit=crop',
+  category: 'Productivity',
+  readTime: '14 min',
+  listenTime: '17 min',
+  progress: 0,
+  rating: 4.4,
+  description: 'Choosing a focused life in a noisy world.',
+  keyTakeaways: ['Less is more in the digital world', 'Be intentional with technology', 'Solitude is essential', 'Cultivate high-quality leisure'],
+  quotes: [{
+    text: 'Digital minimalism is a philosophy that helps you question what digital communication tools add the most value to your life.',
+    author: 'Cal Newport'
+  }],
+  summary: {
+    pages: [{
+      title: 'The Philosophy',
+      content: 'Digital minimalism definitively does not reject the innovations of the internet age, but instead rejects the way so many people currently engage with these tools.'
+    }]
+  },
+  amazonLink: 'https://amazon.com/digital-minimalism'
+}, {
+  id: '7',
+  title: 'Mindset',
+  author: 'Carol Dweck',
+  cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop',
+  category: 'Psychology',
+  readTime: '19 min',
+  listenTime: '23 min',
+  progress: 0,
+  rating: 4.6,
+  description: 'The new psychology of success and how we can learn to fulfill our potential.',
+  keyTakeaways: ['Fixed vs growth mindset', 'Embrace challenges', 'Learn from criticism', 'Persist in the face of setbacks'],
+  quotes: [{
+    text: 'Becoming is better than being.',
+    author: 'Carol Dweck'
+  }],
+  summary: {
+    pages: [{
+      title: 'Two Mindsets',
+      content: 'In a fixed mindset, people believe their basic qualities are fixed traits. In a growth mindset, people believe that their most basic abilities can be developed through dedication and hard work.'
+    }]
+  },
+  amazonLink: 'https://amazon.com/mindset'
+}, {
+  id: '8',
+  title: 'Essentialism',
+  author: 'Greg McKeown',
+  cover: 'https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=400&h=600&fit=crop',
+  category: 'Productivity',
+  readTime: '16 min',
+  listenTime: '20 min',
+  progress: 0,
+  rating: 4.5,
+  description: 'The disciplined pursuit of less but better.',
+  keyTakeaways: ['Less but better', 'Say no to non-essentials', 'Eliminate the trivial many', 'Focus on the vital few'],
+  quotes: [{
+    text: 'If you don\'t prioritize your life, someone else will.',
+    author: 'Greg McKeown'
+  }],
+  summary: {
+    pages: [{
+      title: 'The Essentialist',
+      content: 'Essentialism is not about how to get more things done; it\'s about how to get the right things done. It doesn\'t mean just doing less for the sake of less either.'
+    }]
+  },
+  amazonLink: 'https://amazon.com/essentialism'
 }];
+
+export const popularBooks = ['1', '2', '3', '4', '5'];
+export const latestBooks = ['6', '7', '8', '1', '2'];
+export const trendingBooks = ['1', '3', '5', '7', '2'];
+
+export const collections = [
+  {
+    id: '1',
+    title: 'Must-reads of 2025',
+    description: '8 books',
+    cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop',
+    bookIds: ['1', '2', '7', '8', '3', '5', '6', '4']
+  },
+  {
+    id: '2',
+    title: 'Books by Cal Newport',
+    description: '2 books',
+    cover: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=400&h=600&fit=crop',
+    bookIds: ['2', '6']
+  },
+  {
+    id: '3',
+    title: 'Bestsellers Everyone\'s Reading',
+    description: '5 books',
+    cover: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop',
+    bookIds: ['1', '3', '4', '7', '8']
+  },
+  {
+    id: '4',
+    title: 'Productivity Masterclass',
+    description: '4 books',
+    cover: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400&h=600&fit=crop',
+    bookIds: ['2', '6', '8', '4']
+  },
+  {
+    id: '5',
+    title: 'Transform Your Mindset',
+    description: '3 books',
+    cover: 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=400&h=600&fit=crop',
+    bookIds: ['7', '5', '3']
+  }
+];
+
 export const categories = ['Self-Improvement', 'Productivity', 'Psychology', 'Business', 'Health', 'Leadership', 'Creativity', 'Finance'];
 export const growthPlan = {
   currentMilestone: 'Foundation Builder',

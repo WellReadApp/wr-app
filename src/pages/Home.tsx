@@ -70,11 +70,10 @@ const Home = () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#333333]">For You</h2>
           <button className="text-[#E87968] text-sm font-semibold">
-            See all
+            More
           </button>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {mockBooks.slice(1).map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex-shrink-0 w-36 cursor-pointer">
+        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">{mockBooks.slice(1).map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex-shrink-0 w-36 cursor-pointer">
               <img src={book.cover} alt={book.title} className="w-full h-48 rounded-xl object-cover shadow-md mb-3" />
               <h4 className="font-semibold text-sm text-[#333333] mb-1 line-clamp-2">
                 {book.title}
@@ -106,29 +105,29 @@ const Home = () => {
       </div>
       {/* Recently Added */}
       <div>
-        <h2 className="text-xl font-bold text-[#333333] mb-4">
-          Recently Added
-        </h2>
-        <div className="space-y-3">
-          {mockBooks.map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex gap-3 bg-white p-3 rounded-xl shadow-sm border border-gray-100 cursor-pointer">
-              <img src={book.cover} alt={book.title} className="w-16 h-24 rounded-lg object-cover" />
-              <div className="flex-1">
-                <h4 className="font-semibold text-[#333333] mb-1">
-                  {book.title}
-                </h4>
-                <p className="text-sm text-gray-500 mb-2">{book.author}</p>
-                <div className="flex items-center gap-3 text-xs">
-                  <span className="flex items-center gap-1 text-[#E87968]">
-                    <ClockIcon size={12} />
-                    {book.readTime}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
-                    <span className="text-gray-600 font-medium">{book.rating}</span>
-                  </span>
-                  <span className="px-2 py-1 bg-[#F7B8A1]/20 text-[#E87968] rounded-full font-medium">
-                    {book.category}
-                  </span>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-[#333333]">
+            Recently Added
+          </h2>
+          <button className="text-[#E87968] text-sm font-semibold">
+            More
+          </button>
+        </div>
+        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {mockBooks.map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex-shrink-0 w-36 cursor-pointer">
+              <img src={book.cover} alt={book.title} className="w-full h-48 rounded-xl object-cover shadow-md mb-3" />
+              <h4 className="font-semibold text-sm text-[#333333] mb-1 line-clamp-2">
+                {book.title}
+              </h4>
+              <p className="text-xs text-gray-500 mb-2">{book.author}</p>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-[#E87968]">
+                  <ClockIcon size={12} />
+                  <span className="text-xs font-medium">{book.readTime}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
+                  <span className="text-xs font-medium text-gray-600">{book.rating}</span>
                 </div>
               </div>
             </div>)}
