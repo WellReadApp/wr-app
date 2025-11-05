@@ -8,11 +8,13 @@ const BottomNav = () => {
     path: '/',
     icon: HomeIcon,
     label: 'Home'
-  }, {
-    path: '/growth-plan',
-    icon: TrendingUpIcon,
-    label: 'Growth'
-  }, {
+  }, 
+  // {
+  //   path: '/growth-plan',
+  //   icon: TrendingUpIcon,
+  //   label: 'Growth'
+  // }, 
+  {
     path: '/search',
     icon: SearchIcon,
     label: 'Search'
