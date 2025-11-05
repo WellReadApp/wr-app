@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SearchIcon, ClockIcon, XIcon } from 'lucide-react';
+import { SearchIcon, ClockIcon, XIcon, StarIcon } from 'lucide-react';
 import { mockBooks, categories } from '../utils/mockData';
 const Search = () => {
   const navigate = useNavigate();
@@ -53,6 +53,10 @@ const Search = () => {
                     <span className="flex items-center gap-1 text-[#E87968]">
                       <ClockIcon size={12} />
                       {book.readTime}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
+                      <span className="text-gray-600 font-medium">{book.rating}</span>
                     </span>
                     <span className="px-2 py-1 bg-[#F7B8A1]/20 text-[#E87968] rounded-full font-medium">
                       {book.category}

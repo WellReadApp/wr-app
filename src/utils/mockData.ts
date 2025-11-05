@@ -7,6 +7,7 @@ export const mockBooks = [{
   readTime: '15 min',
   listenTime: '18 min',
   progress: 65,
+  rating: 4.8,
   description: 'An easy & proven way to build good habits & break bad ones. Discover how tiny changes can lead to remarkable results.',
   keyTakeaways: ['Small habits compound over time to create remarkable results', 'Focus on systems, not goals', 'Make it obvious, attractive, easy, and satisfying', 'Environment design is crucial for behavior change'],
   quotes: [{
@@ -41,6 +42,7 @@ export const mockBooks = [{
   readTime: '18 min',
   listenTime: '22 min',
   progress: 0,
+  rating: 4.6,
   description: 'Rules for focused success in a distracted world. Learn how to cultivate deep work and eliminate shallow distractions.',
   keyTakeaways: ['Deep work is becoming increasingly rare and valuable', 'Schedule every minute of your day', 'Embrace boredom to strengthen focus', 'Quit social media strategically'],
   quotes: [{
@@ -69,6 +71,7 @@ export const mockBooks = [{
   readTime: '20 min',
   listenTime: '25 min',
   progress: 0,
+  rating: 4.7,
   description: 'Explore the two systems that drive the way we think and make decisions.',
   keyTakeaways: ['System 1 is fast, intuitive, and emotional', 'System 2 is slower, more deliberative, and logical', 'We are prone to cognitive biases', 'Understanding these systems improves decision-making'],
   quotes: [{

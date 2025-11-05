@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, BookmarkIcon, ShareIcon, Volume2Icon } from 'lucide-react';
+import { ArrowLeftIcon, BookmarkIcon, ShareIcon, Volume2Icon, StarIcon } from 'lucide-react';
 import { mockBooks } from '../utils/mockData';
 import AudioPlayer from '../components/AudioPlayer';
 import InlineFlashcards from '../components/InlineFlashcards';
@@ -10,7 +10,6 @@ const BookDetail = () => {
   } = useParams();
   const navigate = useNavigate();
   const book = mockBooks.find(b => b.id === id);
-  const [activeTab, setActiveTab] = useState<'read' | 'listen'>('read');
   const [isPlaying, setIsPlaying] = useState(false);
   // Inline flashcards will replace modal approach
   if (!book) return null;
@@ -47,6 +46,12 @@ const BookDetail = () => {
               {book.title}
             </h1>
             <p className="text-gray-600 mb-4">{book.author}</p>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="flex items-center gap-1">
+                <StarIcon size={16} className="text-[#F59E0B] fill-[#F59E0B]" />
+                <span className="text-sm font-semibold text-[#333333]">{book.rating}</span>
+              </div>
+            </div>
             <div className="flex gap-4 text-sm text-gray-500">
               <span className="flex items-center gap-1 text-[#E87968] font-medium">
                 {book.readTime}
@@ -58,24 +63,19 @@ const BookDetail = () => {
             </div>
           </div>
         </div>
-        {/* Media Toggle */}
-        <div className="bg-[#F7B8A1]/20 rounded-full p-1 flex mb-6">
+        {/* Action Buttons */}
+        <div className="flex gap-3 mb-6">
           <button
-            onClick={() => {
-              setActiveTab('read');
-              handleStartReading();
-            }}
-            className={`flex-1 py-3 rounded-full font-semibold text-sm transition-all ${activeTab === 'read' ? 'bg-white text-[#333333] shadow-sm' : 'text-gray-500'}`}
+            onClick={handleStartReading}
+            className="flex-1 bg-gradient-to-r from-[#F7B8A1] to-[#E87968] text-white font-semibold py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all"
           >
             Read
           </button>
           <button
-            onClick={() => {
-              setActiveTab('listen');
-              handleStartListening();
-            }}
-            className={`flex-1 py-3 rounded-full font-semibold text-sm transition-all ${activeTab === 'listen' ? 'bg-white text-[#333333] shadow-sm' : 'text-gray-500'}`}
+            onClick={handleStartListening}
+            className="flex-1 bg-white border-2 border-[#E87968] text-[#E87968] font-semibold py-3.5 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2"
           >
+            <Volume2Icon size={18} />
             Listen
           </button>
         </div>

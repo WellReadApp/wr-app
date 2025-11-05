@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayIcon, ClockIcon, ChevronRightIcon } from 'lucide-react';
+import { PlayIcon, ClockIcon, StarIcon } from 'lucide-react';
 import { mockBooks, categories, growthPlan } from '../utils/mockData';
 const Home = () => {
   const navigate = useNavigate();
@@ -8,7 +8,7 @@ const Home = () => {
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#333333] mb-1">Good morning</h1>
+        <h1 className="text-3xl font-bold text-[#333333] mb-1">WellRead</h1>
         <p className="text-gray-500">Ready to grow today?</p>
       </div>
       {/* Continue Learning Card */}
@@ -44,18 +44,12 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {/* Growth Plan Tracker */}
-      <div onClick={() => navigate('/growth-plan')} className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100 cursor-pointer">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-xs text-gray-500 font-medium mb-1">
-              YOUR GROWTH JOURNEY
-            </p>
-            <h3 className="text-[#333333] font-bold text-lg">
-              {growthPlan.currentMilestone}
-            </h3>
-          </div>
-          <ChevronRightIcon className="text-[#E87968]" size={24} />
+      {/* Growth Journey Tracker */}
+      <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
+        <div className="mb-3">
+          <h3 className="text-[#333333] font-bold text-lg">
+            Your Growth Journey
+          </h3>
         </div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-gray-600">
@@ -86,9 +80,15 @@ const Home = () => {
                 {book.title}
               </h4>
               <p className="text-xs text-gray-500 mb-2">{book.author}</p>
-              <div className="flex items-center gap-1 text-[#E87968]">
-                <ClockIcon size={12} />
-                <span className="text-xs font-medium">{book.readTime}</span>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-[#E87968]">
+                  <ClockIcon size={12} />
+                  <span className="text-xs font-medium">{book.readTime}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
+                  <span className="text-xs font-medium text-gray-600">{book.rating}</span>
+                </div>
               </div>
             </div>)}
         </div>
@@ -121,6 +121,10 @@ const Home = () => {
                   <span className="flex items-center gap-1 text-[#E87968]">
                     <ClockIcon size={12} />
                     {book.readTime}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
+                    <span className="text-gray-600 font-medium">{book.rating}</span>
                   </span>
                   <span className="px-2 py-1 bg-[#F7B8A1]/20 text-[#E87968] rounded-full font-medium">
                     {book.category}
