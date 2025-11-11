@@ -4,6 +4,7 @@ import { PlayIcon, ClockIcon, StarIcon, BookOpenIcon } from 'lucide-react';
 import { mockBooks, categories, growthPlan } from '../utils/mockData';
 import { useQuery } from '@apollo/client/react';
 import { LIST_RECENT_BOOKS } from '../services/bookQueries';
+import { useScrollToTop } from '../utils/useScrollToTop';
 
 interface RecentBooksData {
   list_recent_books: Array<{
@@ -18,6 +19,10 @@ interface RecentBooksVars { limit?: number; offset?: number }
 const Home = () => {
   const navigate = useNavigate();
   const continueBook = mockBooks[0];
+  
+  // Scroll to top when navigating to this page
+  useScrollToTop();
+  
   const { data: recentData, loading: recentLoading, error: recentError } = useQuery<RecentBooksData, RecentBooksVars>(LIST_RECENT_BOOKS, {
     variables: { limit: 15, offset: 0 },
     errorPolicy: 'all'

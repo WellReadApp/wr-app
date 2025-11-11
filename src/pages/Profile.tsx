@@ -4,11 +4,15 @@ import { FlameIcon, TrophyIcon, SettingsIcon, LogOutIcon, ChevronRightIcon, KeyI
 import { useAuth } from '../utils/AuthContext';
 import { userStats } from '../utils/mockData';
 import ChangePasswordModal from '../components/ChangePasswordModal';
+import { useScrollToTop } from '../utils/useScrollToTop';
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [showChangePassword, setShowChangePassword] = useState(false);
+
+  // Scroll to top when navigating to this page
+  useScrollToTop();
 
   const handleLogout = async () => {
     await logout();

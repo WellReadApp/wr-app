@@ -1,7 +1,11 @@
 import React from 'react';
 import { TrendingUpIcon, CheckCircleIcon, CircleIcon, SparklesIcon } from 'lucide-react';
 import { growthPlan } from '../utils/mockData';
+import { useScrollToTop } from '../utils/useScrollToTop';
 const GrowthPlan = () => {
+  // Scroll to top when navigating to this page
+  useScrollToTop();
+
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">

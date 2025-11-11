@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchIcon, ClockIcon, XIcon, StarIcon } from 'lucide-react';
 import { mockBooks, popularBooks, latestBooks, trendingBooks, collections, categories } from '../utils/mockData';
+import { useScrollToTop } from '../utils/useScrollToTop';
 const Search = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Scroll to top when navigating to this page
+  useScrollToTop();
 
   const filteredBooks = mockBooks.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase());

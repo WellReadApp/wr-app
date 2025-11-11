@@ -2,9 +2,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookmarkIcon, ClockIcon, TrashIcon } from 'lucide-react';
 import { mockBooks } from '../utils/mockData';
+import { useScrollToTop } from '../utils/useScrollToTop';
 const ReadingList = () => {
   const navigate = useNavigate();
   const savedBooks = mockBooks.slice(0, 2);
+  
+  // Scroll to top when navigating to this page
+  useScrollToTop();
+  
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">

@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client/react';
 import { GET_BOOK } from '../services/bookQueries';
 import AudioPlayer from '../components/AudioPlayer';
 import InlineFlashcards from '../components/InlineFlashcards';
+import { useScrollToTop } from '../utils/useScrollToTop';
 
 interface BookData {
   get_book: {
@@ -25,6 +26,9 @@ const BookDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
+
+  // Scroll to top when navigating to this page or when book ID changes
+  useScrollToTop([id]);
 
   const { data, loading, error } = useQuery<BookData, BookVars>(GET_BOOK, {
     variables: { id: id! },
