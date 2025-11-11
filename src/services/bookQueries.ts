@@ -65,3 +65,50 @@ export const GET_BOOK_KEY_POINTS = gql`
     }
   }
 `;
+
+// Search books by query (using BookService.searchBooks)
+export const SEARCH_BOOKS = gql`
+  query SearchBooks($query: String!, $limit: Int, $offset: Int) {
+    search_books(query: $query, limit: $limit, offset: $offset) {
+      id
+      title
+      primary_author_name
+      description
+      picture_url
+      first_publish_year
+      readinglog_count
+      status
+    }
+  }
+`;
+
+// Fetch popular books (using BookService.listPopularBooks)
+export const LIST_POPULAR_BOOKS = gql`
+  query ListPopularBooks($limit: Int, $offset: Int) {
+    list_popular_books(limit: $limit, offset: $offset) {
+      id
+      title
+      primary_author_name
+      description
+      picture_url
+      first_publish_year
+      readinglog_count
+      status
+    }
+  }
+`;
+
+// Search autocomplete for books (using BookService.searchAutocomplete)
+export const SEARCH_AUTOCOMPLETE = gql`
+  query SearchAutocomplete($query: String!, $limit: Int) {
+    searchAutocomplete(query: $query, limit: $limit) {
+      id
+      title
+      primary_author_name
+      picture_url
+      first_publish_year
+      readinglog_count
+      status
+    }
+  }
+`;
