@@ -1,10 +1,27 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlayIcon, ClockIcon, StarIcon } from 'lucide-react';
+import { PlayIcon, ClockIcon, StarIcon, BookOpenIcon } from 'lucide-react';
 import { mockBooks, categories, growthPlan } from '../utils/mockData';
+import { useQuery } from '@apollo/client/react';
+import { LIST_RECENT_BOOKS } from '../services/bookQueries';
+
+interface RecentBooksData {
+  list_recent_books: Array<{
+    id: string;
+    title: string | null;
+    primary_author_name: string | null;
+    picture_url: string | null;
+  }>;
+}
+
+interface RecentBooksVars { limit?: number; offset?: number }
 const Home = () => {
   const navigate = useNavigate();
   const continueBook = mockBooks[0];
+  const { data: recentData, loading: recentLoading, error: recentError } = useQuery<RecentBooksData, RecentBooksVars>(LIST_RECENT_BOOKS, {
+    variables: { limit: 15, offset: 0 },
+    errorPolicy: 'all'
+  });
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">
@@ -103,34 +120,43 @@ const Home = () => {
             </button>)}
         </div>
       </div>
-      {/* Recently Added */}
+      {/* Recently Added (real data) */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-[#333333]">
-            Recently Added
-          </h2>
-          <button className="text-[#E87968] text-sm font-semibold">
-            More
-          </button>
+          <h2 className="text-xl font-bold text-[#333333]">Recently Added</h2>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {mockBooks.map(book => <div key={book.id} onClick={() => navigate(`/book/${book.id}`)} className="flex-shrink-0 w-36 cursor-pointer">
-              <img src={book.cover} alt={book.title} className="w-full h-48 rounded-xl object-cover shadow-md mb-3" />
+          {recentLoading && <p className="text-sm text-gray-500">Loading…</p>}
+          {recentError && <p className="text-sm text-red-500">Failed to load.</p>}
+          {!recentLoading && !recentError && recentData?.list_recent_books?.length === 0 && (
+            <p className="text-sm text-gray-500">No recent books.</p>
+          )}
+          {!recentLoading && !recentError && recentData?.list_recent_books?.map(book => (
+            <div
+              key={book.id}
+              onClick={() => navigate(`/book/${book.id}`)}
+              className="flex-shrink-0 w-36 cursor-pointer"
+            >
+              {book.picture_url ? (
+                <img
+                  src={book.picture_url}
+                  alt={book.title || 'Book'}
+                  className="w-full h-48 rounded-xl object-cover shadow-md mb-3"
+                />
+              ) : (
+                <div className="w-full h-48 rounded-xl shadow-md mb-3 bg-gradient-to-br from-[#F7B8A1] to-[#E87968] flex flex-col items-center justify-center">
+                  <BookOpenIcon size={32} className="text-white/80 mb-2" />
+                  <div className="text-white/70 text-xs font-medium text-center px-2 leading-tight">
+                    {book.title || 'Untitled'}
+                  </div>
+                </div>
+              )}
               <h4 className="font-semibold text-sm text-[#333333] mb-1 line-clamp-2">
                 {book.title}
               </h4>
-              <p className="text-xs text-gray-500 mb-2">{book.author}</p>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 text-[#E87968]">
-                  <ClockIcon size={12} />
-                  <span className="text-xs font-medium">{book.readTime}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <StarIcon size={12} className="text-[#F59E0B] fill-[#F59E0B]" />
-                  <span className="text-xs font-medium text-gray-600">{book.rating}</span>
-                </div>
-              </div>
-            </div>)}
+              <p className="text-xs text-gray-500 mb-2">{book.primary_author_name}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>;

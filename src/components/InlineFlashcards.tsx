@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 
 interface Quote {
   text: string;
-  author: string;
+  author?: string;
 }
 
 interface InlineFlashcardsProps {
@@ -85,7 +85,9 @@ const InlineFlashcards: React.FC<InlineFlashcardsProps> = ({ quotes, className =
             <div className="text-white text-center px-1">
               <p className="text-4xl leading-none mb-2">"</p>
               <p className="text-base leading-relaxed mb-4 line-clamp-6">{currentQuote.text}</p>
-              <p className="text-sm font-semibold">— {currentQuote.author}</p>
+              {currentQuote.author && (
+                <p className="text-sm font-semibold">— {currentQuote.author}</p>
+              )}
             </div>
           </div>
         </div>

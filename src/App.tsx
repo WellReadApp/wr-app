@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client/react';
 import apolloClient from './services/apolloClient';
 import { AuthProvider } from './utils/AuthContext';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
 import Home from './pages/Home';
 import BookDetail from './pages/BookDetail';
 import ReadView from './pages/ReadView';
@@ -22,7 +23,8 @@ export function App() {
     <ApolloProvider client={apolloClient}>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <AppErrorBoundary>
+            <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -109,7 +111,8 @@ export function App() {
             
             {/* Catch all - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+            </Routes>
+          </AppErrorBoundary>
         </AuthProvider>
       </BrowserRouter>
     </ApolloProvider>
