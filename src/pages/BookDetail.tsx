@@ -17,6 +17,18 @@ interface BookData {
     first_publish_year: number | null;
     readinglog_count: number | null;
     status: string | null;
+    quotes: {
+      id: string;
+      text: string;
+      author: string | null;
+      page_number: number | null;
+      order_index: number | null;
+    }[];
+    key_points: {
+      id: string;
+      point: string;
+      order_index: number | null;
+    }[];
   };
 }
 
@@ -36,19 +48,6 @@ const BookDetail = () => {
     errorPolicy: 'all'
   });
 
-  // Skip the GraphQL queries for now since resolvers don't exist yet
-  // const { data: quotesData, loading: quotesLoading } = useQuery<QuotesData, BookContentVars>(GET_BOOK_QUOTES, {
-  //   variables: { bookId: id! },
-  //   skip: !id,
-  //   errorPolicy: 'all'
-  // });
-
-  // const { data: keyPointsData, loading: keyPointsLoading } = useQuery<KeyPointsData, BookContentVars>(GET_BOOK_KEY_POINTS, {
-  //   variables: { bookId: id! },
-  //   skip: !id,
-  //   errorPolicy: 'all'
-  // });
-
   if (!id) return null;
 
   const handleStartReading = () => {
@@ -59,28 +58,13 @@ const BookDetail = () => {
     setIsPlaying(true);
   };
 
-  // Temporary mock data until backend resolvers are implemented
-  const quotes = [
-    {
-      text: "You do not rise to the level of your goals. You fall to the level of your systems.",
-    },
-    {
-      text: "Every action you take is a vote for the type of person you wish to become.",
-    },
-    {
-      text: "The most effective way to change your habits is to focus not on what you want to achieve, but on who you wish to become.",
-    }
-  ];
+  // Get quotes and key points from the main book data
+  const quotes = data?.get_book?.quotes?.map(quote => ({
+    text: quote.text,
+    author: quote.author || undefined
+  })) || [];
 
-  const keyTakeaways = [
-    "Small habits compound over time to create remarkable results",
-    "Focus on systems, not goals",
-    "Make it obvious, attractive, easy, and satisfying",
-    "Environment design is crucial for behavior change"
-  ];
-
-  const quotesLoading = false;
-  const keyPointsLoading = false;
+  const keyTakeaways = data?.get_book?.key_points?.map(keyPoint => keyPoint.point) || [];
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-[#FCF8F5] pb-24">
@@ -169,28 +153,49 @@ const BookDetail = () => {
             )}
 
             {/* Key Takeaways */}
-            {!keyPointsLoading && keyTakeaways.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-[#333333] mb-3">
-                  Key Takeaways
-                </h3>
-                <div className="space-y-3">
-                  {keyTakeaways.map((takeaway, index) => (
-                    <div key={index} className="flex gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#E87968] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <p className="text-gray-600 leading-relaxed">{takeaway}</p>
-                    </div>
-                  ))}
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-[#333333] mb-3">
+                Key Takeaways
+              </h3>
+              {loading ? (
+                <p className="text-gray-500">Loading key takeaways...</p>
+              ) : error ? (
+                <div className="text-red-500">
+                  <p>Error loading data: {error.message}</p>
                 </div>
-              </div>
-            )}
+              ) : data?.get_book ? (
+                keyTakeaways.length > 0 ? (
+                  <div className="space-y-3">
+                    {keyTakeaways.map((takeaway, index) => (
+                      <div key={index} className="flex gap-3">
+                        <div className="w-6 h-6 rounded-full bg-[#E87968] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <p className="text-gray-600 leading-relaxed">{takeaway}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">No key takeaways available for this book.</p>
+                )
+              ) : (
+                <p className="text-gray-500">Book not found</p>
+              )}
+            </div>
 
             {/* Inline Flashcards */}
-            {!quotesLoading && quotes.length > 0 && (
-              <InlineFlashcards quotes={quotes} />
-            )}
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-[#333333] mb-3">
+                Flashcard Quotes
+              </h3>
+              {loading ? (
+                <p className="text-gray-500">Loading quotes...</p>
+              ) : quotes.length > 0 ? (
+                <InlineFlashcards quotes={quotes} />
+              ) : (
+                <p className="text-gray-500">No quotes available for this book.</p>
+              )}
+            </div>
           </>
         )}
       </div>

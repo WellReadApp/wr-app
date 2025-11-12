@@ -12,6 +12,18 @@ export const GET_BOOK = gql`
       first_publish_year
       readinglog_count
       status
+      quotes {
+        id
+        text
+        author
+        page_number
+        order_index
+      }
+      key_points {
+        id
+        point
+        order_index
+      }
     }
   }
 `;
