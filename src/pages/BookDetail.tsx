@@ -191,7 +191,9 @@ const BookDetail = () => {
               {loading ? (
                 <p className="text-gray-500">Loading quotes...</p>
               ) : quotes.length > 0 ? (
-                <InlineFlashcards quotes={quotes} />
+                <div className="mt-2">
+                  <InlineFlashcards quotes={quotes} />
+                </div>
               ) : (
                 <p className="text-gray-500">No quotes available for this book.</p>
               )}

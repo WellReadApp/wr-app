@@ -51,8 +51,7 @@ const InlineFlashcards: React.FC<InlineFlashcardsProps> = ({ quotes, className =
   const nextQuote = quotes.length > 1 ? quotes[nextIndex] : null;
 
   return (
-    <div className={`mt-8 ${className}`}>      
-      <h3 className="text-lg font-bold text-[#333333] mb-3">Flashcard Quotes</h3>
+    <div className={`${className}`}>      
       <div
         className="relative h-[240px] overflow-visible"
         onTouchStart={onTouchStart}
