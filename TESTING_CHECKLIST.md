@@ -2,13 +2,14 @@
 
 Use this checklist to verify your authentication system is working correctly.
 
-## Backend Setup
-- [ ] Backend server is running on `http://localhost:4000`
-- [ ] GraphQL endpoint is accessible at `http://localhost:4000/graphql` (or your configured path)
-- [ ] CORS is enabled for `http://localhost:5173`
+## Backend Requirements
+- [ ] Backend server is running and accessible
+- [ ] GraphQL endpoint is accessible at your configured URL
+- [ ] CORS is properly configured for your frontend domain
 
-## Frontend Setup
-- [ ] `.env` file exists with `VITE_GRAPH_URL=http://localhost:4000`
+## Environment Setup
+- [ ] `.env` file exists with correct `VITE_GRAPH_URL` (REQUIRED)
+- [ ] `VITE_GRAPH_URL` points to your GraphQL backend endpoint
 - [ ] Dependencies installed (`npm install`)
 - [ ] Dev server starts without errors (`npm run dev`)
 - [ ] Build succeeds (`npm run build`)

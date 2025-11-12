@@ -6,14 +6,14 @@ Your WellRead app now has a complete authentication system with:
 
 1. **Login & Signup Pages** - Beautiful, responsive forms with validation
 2. **Protected Routes** - All app routes secured behind authentication
-3. **Apollo Client** - Configured to work with your GraphQL backend at `http://localhost:4000`
+3. **Apollo Client** - Configured to work with your GraphQL backend (URL configured in `.env`)
 4. **User Profile** - Updated to show real user data and logout functionality
 5. **Token Management** - Automatic token storage and injection into API requests
 
 ## 🚀 Getting Started
 
 ### 1. Start Your Backend
-Make sure your GraphQL backend is running on `http://localhost:4000`
+Make sure your GraphQL backend is running and accessible at the URL specified in your `.env` file
 
 ### 2. Start the Frontend
 ```bash
@@ -170,7 +170,7 @@ function Home() {
 ## 🐛 Troubleshooting
 
 **"Network error" or "Failed to fetch":**
-- Check if backend is running on `http://localhost:4000`
+- Check if backend is running and accessible at the URL in your `.env` file
 - Verify CORS is enabled on backend
 - Check browser console for detailed errors
 

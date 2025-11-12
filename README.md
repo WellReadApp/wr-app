@@ -15,7 +15,7 @@ A beautiful mobile-first reading app that helps users grow through curated book 
 
 ### Prerequisites
 - Node.js 16+ installed
-- GraphQL backend running on `http://localhost:4000`
+- GraphQL backend running (configure URL in `.env` file)
 
 ### Installation
 
@@ -25,7 +25,11 @@ A beautiful mobile-first reading app that helps users grow through curated book 
    ```
 
 2. **Set up environment variables:**
-   Create a `.env` file:
+   Create a `.env` file with your backend URL (REQUIRED):
+   ```env
+   VITE_GRAPH_URL=https://your-backend-url.com/graph
+   ```
+   For local development, use:
    ```env
    VITE_GRAPH_URL=http://localhost:4000
    ```
@@ -185,7 +189,7 @@ npm run preview
 ## 🐛 Troubleshooting
 
 **Can't log in?**
-- Ensure backend is running on `http://localhost:4000`
+- Ensure backend is running and accessible at the URL in your `.env` file
 - Check browser console for errors
 - Verify CORS is enabled on backend
 

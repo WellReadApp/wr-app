@@ -61,7 +61,7 @@ Complete authentication system implemented for WellRead app with login, signup, 
 ## Environment Variables
 
 ```env
-VITE_GRAPH_URL=http://localhost:4000
+VITE_GRAPH_URL=https://your-backend-url.com/graph
 ```
 
 ## GraphQL Operations

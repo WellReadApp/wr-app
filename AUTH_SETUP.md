@@ -27,7 +27,7 @@ Complete authentication system with login, signup, route protection, and Apollo 
 ### Environment Variables
 Create a `.env` file in the root directory:
 ```
-VITE_GRAPH_URL=http://localhost:4000
+VITE_GRAPH_URL=https://your-backend-url.com/graph
 ```
 
 ### Backend GraphQL API
@@ -146,9 +146,9 @@ function ProfileEditor() {
    npm run dev
    ```
 
-3. **Make sure your backend is running on:**
+3. **Make sure your backend is running and accessible at the URL configured in your `.env` file:**
    ```
-   http://localhost:4000
+   VITE_GRAPH_URL=https://your-backend-url.com/graph
    ```
 
 4. **Access the app:**

@@ -1,8 +1,14 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
+// Ensure VITE_GRAPH_URL is defined
+const graphqlUrl = import.meta.env.VITE_GRAPH_URL;
+if (!graphqlUrl) {
+  throw new Error('VITE_GRAPH_URL environment variable is required but not defined. Please check your .env file.');
+}
+
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPH_URL || 'http://localhost:4000',
+  uri: graphqlUrl,
 });
 
 const authLink = setContext((_, { headers }) => {
