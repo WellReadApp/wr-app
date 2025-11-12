@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, TypeIcon, CheckCircleIcon } from 'lucide-react';
 import { useQuery } from '@apollo/client/react';
@@ -24,7 +24,12 @@ const ReadView = () => {
 
   const { data, loading, error } = useQuery<SummaryData, SummaryVars>(LIST_BOOK_SUMMARY_PAGES, {
     variables: { bookId: id! },
-    skip: !id
+    skip: !id,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    // Cache summary pages for a long time as they rarely change
+    notifyOnNetworkStatusChange: true,
   });
 
   const pages = data?.list_book_summary_pages || [];

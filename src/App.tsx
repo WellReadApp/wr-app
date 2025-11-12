@@ -4,6 +4,7 @@ import { ApolloProvider } from '@apollo/client/react';
 import apolloClient from './services/apolloClient';
 import { AuthProvider } from './utils/AuthContext';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
+import { preloadCriticalData } from './utils/cacheUtils';
 import PWAInstallationGate from './components/PWAInstallationGate';
 import Home from './pages/Home';
 import BookDetail from './pages/BookDetail';
@@ -57,6 +58,14 @@ export function App() {
       const installed = isStandalone() || hasBypass();
       setIsInstalled(installed);
       setIsCheckingInstallation(false);
+      
+      // Preload critical data once app is ready and user is logged in
+      if (installed) {
+        // Small delay to ensure Apollo Client is ready
+        setTimeout(() => {
+          preloadCriticalData().catch(console.warn);
+        }, 1000);
+      }
     };
 
     // Check immediately

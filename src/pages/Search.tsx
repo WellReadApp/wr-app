@@ -46,25 +46,35 @@ const Search = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch popular books - temporarily use recent books to test
+  // Fetch popular books - cache for 15 minutes
   const { data: popularData, loading: popularLoading, error: popularError } = useQuery<{ list_popular_books: Book[] }, ListVars>(LIST_POPULAR_BOOKS, {
     variables: { limit: 10, offset: 0 },
-    skip: false,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
     errorPolicy: 'all',
+    // Refetch every 15 minutes
+    pollInterval: 15 * 60 * 1000,
   });
 
-  // Fetch recent books
+  // Fetch recent books - cache for 10 minutes  
   const { data: recentData, loading: recentLoading, error: recentError } = useQuery<{ list_recent_books: Book[] }, ListVars>(LIST_RECENT_BOOKS, {
     variables: { limit: 10, offset: 0 },
-    skip: false,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
     errorPolicy: 'all',
+    // Refetch every 10 minutes
+    pollInterval: 10 * 60 * 1000,
   });
 
-  // Search books when query is provided
+  // Search books when query is provided - cache search results
   const { data: searchData, loading: searchLoading, error: searchError } = useQuery<{ search_books: Book[] }, SearchVars>(SEARCH_BOOKS, {
     variables: { query: debouncedQuery, limit: 20, offset: 0 },
     skip: !debouncedQuery.trim(),
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
     errorPolicy: 'all',
+    // Cache search results for 5 minutes
+    pollInterval: 5 * 60 * 1000,
   });
 
   const popularBooks = popularData?.list_popular_books || [];

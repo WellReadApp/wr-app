@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlayIcon, BookOpenIcon } from 'lucide-react';
 import { mockBooks, categories, growthPlan } from '../utils/mockData';
@@ -34,12 +33,20 @@ const Home = () => {
   
   const { data: recentData, loading: recentLoading, error: recentError } = useQuery<RecentBooksData, RecentBooksVars>(LIST_RECENT_BOOKS, {
     variables: { limit: 15, offset: 0 },
-    errorPolicy: 'all'
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    // Refetch every 10 minutes
+    pollInterval: 10 * 60 * 1000,
   });
 
   const { data: popularData, loading: popularLoading, error: popularError } = useQuery<PopularBooksData, RecentBooksVars>(LIST_POPULAR_BOOKS, {
     variables: { limit: 10, offset: 0 },
-    errorPolicy: 'all'
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    // Refetch every 15 minutes
+    pollInterval: 15 * 60 * 1000,
   });
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}

@@ -45,7 +45,11 @@ const BookDetail = () => {
   const { data, loading, error } = useQuery<BookData, BookVars>(GET_BOOK, {
     variables: { id: id! },
     skip: !id,
-    errorPolicy: 'all'
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    errorPolicy: 'all',
+    // Cache book details for a long time since they don't change often
+    notifyOnNetworkStatusChange: true,
   });
 
   if (!id) return null;
