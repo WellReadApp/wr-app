@@ -12,6 +12,18 @@ export const GET_BOOK = gql`
       first_publish_year
       readinglog_count
       status
+      library_status {
+        user_id
+        book_id
+        status
+        added_at
+        updated_at
+      }
+      reading_progress {
+        progress
+        current_page
+        last_read_at
+      }
       quotes {
         id
         text

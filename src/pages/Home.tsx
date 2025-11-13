@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { PlayIcon, BookOpenIcon } from 'lucide-react';
-import { mockBooks, categories, growthPlan } from '../utils/mockData';
+import { categories } from '../utils/mockData';
 import { useQuery } from '@apollo/client/react';
 import { LIST_RECENT_BOOKS, LIST_POPULAR_BOOKS } from '../services/bookQueries';
+import { GET_CURRENT_BOOK, GET_READING_STATS, GET_USER_LIBRARY } from '../services/libraryQueries';
 import { useScrollToTop } from '../utils/useScrollToTop';
+import { useAuth } from '../utils/AuthContext';
+import { progressTracker } from '../utils/progressTracker';
 
 interface RecentBooksData {
   list_recent_books: Array<{
@@ -23,10 +26,40 @@ interface PopularBooksData {
   }>;
 }
 
+interface CurrentBookData {
+  get_current_book: {
+    user_id: string;
+    book_id: string;
+    status: string;
+    added_at: string;
+    updated_at: string;
+    book: {
+      id: string;
+      title: string | null;
+      primary_author_name: string | null;
+      picture_url: string | null;
+      first_publish_year: number | null;
+    };
+    reading_progress: {
+      progress: number;
+      current_page?: number;
+      last_read_at?: string;
+    } | null;
+  } | null;
+}
+
+interface ReadingStatsData {
+  get_reading_stats: {
+    booksRead: number;
+    totalBooksInList: number;
+    progressPercentage: number;
+  };
+}
+
 interface RecentBooksVars { limit?: number; offset?: number }
 const Home = () => {
   const navigate = useNavigate();
-  const continueBook = mockBooks[0];
+  const { user } = useAuth();
   
   // Scroll to top when navigating to this page
   useScrollToTop();
@@ -48,45 +81,128 @@ const Home = () => {
     // Refetch every 15 minutes
     pollInterval: 15 * 60 * 1000,
   });
+
+
+  // Get all books in user's library
+  const { data: libraryData, loading: libraryLoading } = useQuery<any>(GET_USER_LIBRARY, {
+    skip: !user,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+  });
+
+  // Get current reading book for the continue reading card
+  const { data: currentBookData } = useQuery<CurrentBookData>(GET_CURRENT_BOOK, {
+    skip: !user,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+  });
+
+  // Get reading statistics for the growth journey
+  const { data: readingStatsData, loading: readingStatsLoading } = useQuery<ReadingStatsData>(GET_READING_STATS, {
+    skip: !user,
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+  });
+
+  const currentBook = currentBookData?.get_current_book;
+  const readingStats = readingStatsData?.get_reading_stats;
+
+  // Reading list books (all saved books)
+  const readingListBooks = libraryData?.get_library || [];
+
+  // Growth journey: completed/saved
+  const completedBooks = readingListBooks.filter((b: any) => b.status === 'completed').length;
+  const savedBooks = readingListBooks.length;
+  const growthPercent = savedBooks > 0 ? Math.round((completedBooks / savedBooks) * 100) : 0;
+
+  // Get local progress to supplement server data
+  const getProgressForBook = (bookId: string) => {
+    const localProgress = progressTracker.getProgress(bookId);
+    const serverProgress = currentBook?.reading_progress?.progress || 0;
+    return Math.max(localProgress?.progress || 0, serverProgress);
+  };
+
+  // Get combined progress (server + local) - same as Reading List
+  const getCombinedProgress = (bookId: string, serverProgress: number) => {
+    const localProgress = progressTracker.getProgress(bookId);
+    return Math.max(serverProgress || 0, localProgress?.progress || 0);
+  };
+
+  const handleContinueReading = () => {
+    if (currentBook) {
+      // Navigate to reading view to continue from where they left off
+      navigate(`/book/${currentBook.book.id}/read`);
+    }
+  };
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-[#333333] mb-1">WellRead</h1>
         <p className="text-gray-500">Ready to grow today?</p>
       </div>
-      {/* Continue Learning Card */}
-      <div onClick={() => navigate(`/book/${continueBook.id}`)} className="bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-2xl p-5 mb-6 shadow-lg cursor-pointer">
-        <div className="flex gap-4">
-          <img src={continueBook.cover} alt={continueBook.title} className="w-24 h-32 rounded-lg object-cover shadow-md" />
-          <div className="flex-1 flex flex-col justify-between">
-            <div>
-              <p className="text-white/90 text-xs font-medium mb-1">
-                CONTINUE LEARNING
-              </p>
-              <h3 className="text-white font-bold text-lg mb-1">
-                {continueBook.title}
-              </h3>
-              <p className="text-white/90 text-sm">{continueBook.author}</p>
-            </div>
-            <div className="mt-3">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/90 text-xs font-medium">
-                  {continueBook.progress}% complete
-                </span>
-              </div>
-              <div className="w-full bg-white/30 rounded-full h-2 mb-3">
-                <div className="bg-white rounded-full h-2 transition-all" style={{
-                width: `${continueBook.progress}%`
-              }} />
-              </div>
-              <button className="w-full bg-white text-[#E87968] font-semibold py-2.5 rounded-full flex items-center justify-center gap-2 shadow-md">
-                <PlayIcon size={18} fill="currentColor" />
-                Resume Reading
-              </button>
-            </div>
+      {/* Reading List Resume Scroll */}
+      {readingListBooks.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-[#333333] mb-2">Resume Reading</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {readingListBooks.map((entry: any) => {
+              const serverProgress = entry.reading_progress?.progress || 0;
+              const progressValue = getCombinedProgress(entry.book.id, serverProgress);
+              
+              return (
+                <div key={entry.book.id} className="flex-shrink-0 w-48 bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-2xl p-4 shadow-lg cursor-pointer" onClick={() => navigate(`/book/${entry.book.id}`)}>
+                  {entry.book.picture_url ? (
+                    <img
+                      src={entry.book.picture_url}
+                      alt={entry.book.title || 'Book'}
+                      className="w-full h-48 rounded-xl object-cover shadow-md mb-3"
+                    />
+                  ) : (
+                    <div className="w-full h-48 rounded-xl bg-white/20 flex items-center justify-center mb-3">
+                      <BookOpenIcon size={32} className="text-white/60" />
+                    </div>
+                  )}
+                  <div className="flex flex-col">
+                    <h4 className="font-semibold text-sm text-white mb-1 line-clamp-2">{entry.book.title}</h4>
+                    <p className="text-xs text-white/80 mb-3">{entry.book.primary_author_name}</p>
+                    
+                    {progressValue > 0 && (
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-white/90">
+                            {Math.round(progressValue)}% complete
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/30 rounded-full h-2">
+                          <div 
+                            className="bg-white rounded-full h-2 transition-all" 
+                            style={{ width: `${progressValue}%` }} 
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center justify-center mt-auto">
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/book/${entry.book.id}/read`);
+                        }} 
+                        className="bg-white text-[#E87968] font-semibold py-2 px-4 rounded-full text-xs hover:shadow-md transition-all flex items-center gap-2 w-full justify-center"
+                      >
+                        <PlayIcon size={12} fill="currentColor" />
+                        {progressValue >= 100 ? 'Read Again' : 
+                         progressValue > 0 ? 'Continue' : 
+                         'Start Reading'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
+      )}
       {/* Growth Journey Tracker */}
       <div className="bg-white rounded-2xl p-5 mb-6 shadow-sm border border-gray-100">
         <div className="mb-3">
@@ -96,16 +212,19 @@ const Home = () => {
         </div>
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-gray-600">
-            {growthPlan.completedBooks} of {growthPlan.totalBooks} books
+            {savedBooks === 0 ? '0 of 0 books' : `${completedBooks} of ${savedBooks} books`}
           </span>
           <span className="text-sm font-semibold text-[#E87968]">
-            {growthPlan.progress}%
+            {growthPercent}%
           </span>
         </div>
         <div className="w-full bg-gray-100 rounded-full h-3">
-          <div className="bg-gradient-to-r from-[#F7B8A1] to-[#E87968] rounded-full h-3 transition-all" style={{
-          width: `${growthPlan.progress}%`
-        }} />
+          <div 
+            className="bg-gradient-to-r from-[#F7B8A1] to-[#E87968] rounded-full h-3 transition-all" 
+            style={{
+              width: `${growthPercent}%`
+            }} 
+          />
         </div>
       </div>
       {/* For You Section */}

@@ -1,5 +1,6 @@
 import client from '../services/apolloClient';
-import { LIST_POPULAR_BOOKS, LIST_RECENT_BOOKS } from '../services/bookQueries';
+import { LIST_POPULAR_BOOKS, LIST_RECENT_BOOKS, GET_BOOK } from '../services/bookQueries';
+import { GET_USER_LIBRARY, GET_CURRENT_BOOK } from '../services/libraryQueries';
 
 /**
  * Cache utilities for managing Apollo Client cache
@@ -52,6 +53,75 @@ export const clearBookCache = (bookId: string) => {
 };
 
 /**
+ * Clear library-related caches when library status changes
+ */
+export const clearLibraryCaches = () => {
+  const queries = [
+    'get_library',
+    'get_current_book',
+    'get_reading_stats',
+    'get_library_by_status'
+  ];
+  
+  queries.forEach(query => clearQueryCache(query));
+};
+
+/**
+ * Optimistically update library status in cache
+ */
+export const updateLibraryStatusOptimistically = (bookId: string, isAdding: boolean) => {
+  try {
+    // Update the book's library_status field
+    const bookCache = client.cache.readQuery({
+      query: GET_BOOK,
+      variables: { id: bookId }
+    }) as any;
+
+    if (bookCache?.get_book) {
+      const updatedBook = {
+        ...bookCache,
+        get_book: {
+          ...bookCache.get_book,
+          library_status: isAdding ? {
+            user_id: localStorage.getItem('userId'),
+            book_id: bookId,
+            status: 'want-to-read',
+            added_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          } : null
+        }
+      };
+
+      client.cache.writeQuery({
+        query: GET_BOOK,
+        variables: { id: bookId },
+        data: updatedBook
+      });
+    }
+
+    // Clear library caches to force refresh
+    clearLibraryCaches();
+  } catch (error) {
+    console.warn('Failed to update library status optimistically:', error);
+  }
+};
+
+/**
+ * Prefetch book details when user is likely to view them
+ */
+export const prefetchBook = async (bookId: string) => {
+  try {
+    await client.query({
+      query: GET_BOOK,
+      variables: { id: bookId },
+      fetchPolicy: 'cache-first'
+    });
+  } catch (error) {
+    console.warn(`Failed to prefetch book ${bookId}:`, error);
+  }
+};
+
+/**
  * Refresh a specific query by refetching from network
  */
 export const refreshQuery = async (queryName: string, _variables?: Record<string, any>) => {
@@ -100,6 +170,29 @@ export const preloadCriticalData = async () => {
 };
 
 /**
+ * Preload user library data if authenticated
+ */
+export const preloadUserData = async () => {
+  try {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      await Promise.all([
+        client.query({
+          query: GET_USER_LIBRARY,
+          fetchPolicy: 'cache-first',
+        }),
+        client.query({
+          query: GET_CURRENT_BOOK,
+          fetchPolicy: 'cache-first',
+        })
+      ]);
+    }
+  } catch (error) {
+    console.warn('Failed to preload user data:', error);
+  }
+};
+
+/**
  * Setup periodic cache refresh for frequently changing data
  */
 export const setupCacheRefresh = () => {
@@ -114,13 +207,38 @@ export const setupCacheRefresh = () => {
   }, CACHE_DURATIONS.RECENT_BOOKS);
 };
 
+/**
+ * Smart prefetch based on user behavior
+ */
+export const smartPrefetch = {
+  // Prefetch books when user hovers over them
+  onHover: (bookId: string) => {
+    setTimeout(() => prefetchBook(bookId), 100); // Small delay to avoid excessive requests
+  },
+
+  // Batch prefetch visible books
+  batchPrefetch: async (bookIds: string[]) => {
+    const promises = bookIds.slice(0, 5).map(id => prefetchBook(id)); // Limit to 5
+    try {
+      await Promise.allSettled(promises);
+    } catch (error) {
+      console.warn('Batch prefetch failed:', error);
+    }
+  }
+};
+
 export default {
   clearQueryCache,
   clearBookCaches,
   clearBookCache,
+  clearLibraryCaches,
+  updateLibraryStatusOptimistically,
+  prefetchBook,
   refreshQuery,
   getCacheStats,
   preloadCriticalData,
+  preloadUserData,
   setupCacheRefresh,
+  smartPrefetch,
   CACHE_DURATIONS,
 };

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, TypeIcon, CheckCircleIcon } from 'lucide-react';
 import { useQuery } from '@apollo/client/react';
 import { LIST_BOOK_SUMMARY_PAGES } from '../services/bookQueries';
+import { progressTracker } from '../utils/progressTracker';
 
 interface SummaryPage {
   id: string;
@@ -21,6 +22,7 @@ const ReadView = () => {
   const navigate = useNavigate();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [fontSize, setFontSize] = useState<'small' | 'base' | 'large' | 'xlarge'>('base');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const { data, loading, error } = useQuery<SummaryData, SummaryVars>(LIST_BOOK_SUMMARY_PAGES, {
     variables: { bookId: id! },
@@ -36,6 +38,35 @@ const ReadView = () => {
   const totalPages = pages.length;
   const progress = totalPages ? ((currentPageIndex + 1) / totalPages) * 100 : 0;
 
+  // Initialize progress tracking and restore last page when component mounts
+  useEffect(() => {
+    if (id && totalPages > 0 && !isInitialized) {
+      // Get saved progress
+      const savedProgress = progressTracker.getProgress(id);
+      
+      if (savedProgress && savedProgress.currentPage > 0) {
+        // Restore from last read page (convert to 0-based index)
+        const lastPageIndex = Math.max(0, Math.min(savedProgress.currentPage - 1, totalPages - 1));
+        setCurrentPageIndex(lastPageIndex);
+        console.log(`📖 Restored reading position: Page ${savedProgress.currentPage} of ${totalPages}`);
+      } else {
+        // Start fresh reading session
+        progressTracker.startReading(id, totalPages);
+        console.log(`📖 Starting new reading session: Page 1 of ${totalPages}`);
+      }
+      
+      setIsInitialized(true);
+    }
+  }, [id, totalPages, isInitialized]);
+
+  // Update progress when page changes (only after initialization)
+  useEffect(() => {
+    if (id && totalPages > 0 && isInitialized) {
+      const pageNumber = currentPageIndex + 1;
+      progressTracker.updateProgress(id, pageNumber, totalPages);
+    }
+  }, [currentPageIndex, id, totalPages, isInitialized, progress]);
+
   const fontSizes: Record<string, string> = {
     small: 'text-sm',
     base: 'text-base',
@@ -50,8 +81,28 @@ const ReadView = () => {
   };
 
   const handleMarkAsDone = () => {
-    // Navigate back to book detail or home page
+    // Mark reading as completed
+    if (id) {
+      progressTracker.completeReading(id);
+      progressTracker.saveToStorage();
+    }
+    // Navigate back to book detail
     navigate(`/book/${id}`);
+  };
+
+  const handlePageChange = (newIndex: number) => {
+    setCurrentPageIndex(newIndex);
+    // Progress is automatically updated via useEffect
+  };
+
+  const handleGoBack = () => {
+    // Save progress before leaving
+    if (id && totalPages > 0) {
+      const pageNumber = currentPageIndex + 1;
+      progressTracker.updateProgress(id, pageNumber, totalPages);
+      progressTracker.saveToStorage();
+    }
+    navigate(-1);
   };
 
   return (
@@ -59,7 +110,7 @@ const ReadView = () => {
       {/* Header */}
       <div className="sticky top-0 bg-[#FCF8F5] z-10 px-4 py-4 border-b border-gray-100">
         <div className="flex items-center justify-between mb-3">
-          <button onClick={() => navigate(-1)} className="p-2">
+          <button onClick={handleGoBack} className="p-2">
             <ArrowLeftIcon className="text-[#333333]" size={24} />
           </button>
           <div className="flex gap-2">
@@ -105,7 +156,7 @@ const ReadView = () => {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4">
           <div className="max-w-md mx-auto flex justify-between items-center">
             <button
-              onClick={() => setCurrentPageIndex(Math.max(0, currentPageIndex - 1))}
+              onClick={() => handlePageChange(Math.max(0, currentPageIndex - 1))}
               disabled={currentPageIndex === 0}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold ${currentPageIndex === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-[#F7B8A1] text-white'}`}
             >
@@ -122,7 +173,7 @@ const ReadView = () => {
               </button>
             ) : (
               <button
-                onClick={() => setCurrentPageIndex(Math.min(totalPages - 1, currentPageIndex + 1))}
+                onClick={() => handlePageChange(Math.min(totalPages - 1, currentPageIndex + 1))}
                 className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold bg-[#E87968] text-white"
               >
                 Next
