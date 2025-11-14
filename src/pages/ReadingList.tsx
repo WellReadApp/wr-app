@@ -111,7 +111,7 @@ const ReadingList = () => {
     return (
       <div className="max-w-md mx-auto px-4 py-6 pb-24">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#333333] mb-2">Reading List</h1>
+          <h1 className="text-3xl font-bold text-[#333333] mb-2">Library</h1>
         </div>
         <p className="text-gray-500">Loading your books...</p>
       </div>
@@ -122,7 +122,7 @@ const ReadingList = () => {
     return (
       <div className="max-w-md mx-auto px-4 py-6 pb-24">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[#333333] mb-2">Reading List</h1>
+          <h1 className="text-3xl font-bold text-[#333333] mb-2">Library</h1>
         </div>
         <p className="text-red-500">Error loading your reading list.</p>
       </div>
@@ -132,7 +132,7 @@ const ReadingList = () => {
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#333333] mb-2">Reading List</h1>
+        <h1 className="text-3xl font-bold text-[#333333] mb-2">Library</h1>
         <p className="text-gray-500">{savedBooks.length} books saved</p>
       </div>
       {/* Empty State */}
@@ -171,17 +171,11 @@ const ReadingList = () => {
                     <h4 className="font-semibold text-[#333333] mb-1">
                       {book.title}
                     </h4>
-                    <p className="text-sm text-gray-500 mb-2">{book.primary_author_name}</p>
-                    <div className="text-xs mb-3">
-                      <span className="px-2 py-1 bg-[#F7B8A1]/20 text-[#E87968] rounded-full font-medium capitalize">
-                        {bookEntry.status.replace('-', ' ')}
-                      </span>
-                      {book.first_publish_year && (
-                        <span className="ml-2 text-gray-500">
-                          {book.first_publish_year}
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-sm text-gray-500 mb-3">
+                      {book.primary_author_name}
+                      {book.primary_author_name && book.first_publish_year && ' • '}
+                      {book.first_publish_year}
+                    </p>
                     {progressValue > 0 && (
                       <div>
                         <div className="flex items-center justify-between mb-1">
