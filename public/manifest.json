@@ -1,6 +1,6 @@
 {
-  "name": "WellRead - Personal Growth Library",
-  "short_name": "WellRead",
+  "name": "Well Read - Personal Growth Library",
+  "short_name": "Well Read",
   "description": "Your personal library for growth, learning, and knowledge. Discover, read, and grow with curated book recommendations.",
   "start_url": "/",
   "display": "standalone",
