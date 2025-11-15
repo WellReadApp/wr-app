@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, TypeIcon, CheckCircleIcon } from 'lucide-react';
-import { useQuery } from '@apollo/client/react';
+import { useQuery, useMutation } from '@apollo/client/react';
 import { LIST_BOOK_SUMMARY_PAGES } from '../services/bookQueries';
+import { UPDATE_LIBRARY_STATUS, GET_USER_LIBRARY } from '../services/libraryQueries';
 import { progressTracker } from '../utils/progressTracker';
 
 interface SummaryPage {
@@ -20,9 +21,36 @@ interface SummaryVars { bookId: string; }
 const ReadView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [fontSize, setFontSize] = useState<'small' | 'base' | 'large' | 'xlarge'>('base');
   const [isInitialized, setIsInitialized] = useState(false);
+  
+  // Track where user came from (home or library)
+  const sourceRoute = (location.state as any)?.from || '/';
+  
+  // Mutation to update library status
+  const [updateLibraryStatus] = useMutation(UPDATE_LIBRARY_STATUS, {
+    refetchQueries: [{ query: GET_USER_LIBRARY }],
+    awaitRefetchQueries: true, // Wait for refetch to complete
+    update: (cache, { data }) => {
+      // Immediately update the cache
+      try {
+        const existingLibrary = cache.readQuery({ query: GET_USER_LIBRARY });
+        if (existingLibrary && data) {
+          const updatedLibrary = (existingLibrary as any).get_library.map((item: any) => 
+            item.book_id === id ? { ...item, status: 'completed' } : item
+          );
+          cache.writeQuery({
+            query: GET_USER_LIBRARY,
+            data: { get_library: updatedLibrary }
+          });
+        }
+      } catch (cacheError) {
+        console.log('Cache update failed:', cacheError);
+      }
+    }
+  });
 
   const { data, loading, error } = useQuery<SummaryData, SummaryVars>(LIST_BOOK_SUMMARY_PAGES, {
     variables: { bookId: id! },
@@ -80,14 +108,33 @@ const ReadView = () => {
     setFontSize(order[(idx + 1) % order.length]);
   };
 
-  const handleMarkAsDone = () => {
-    // Mark reading as completed
-    if (id) {
-      progressTracker.completeReading(id);
-      progressTracker.saveToStorage();
+  const handleMarkAsDone = async () => {
+    if (!id) return;
+    
+    console.log('📕 Marking book as read:', id);
+    
+    // First, update progress to 100% in backend
+    progressTracker.updateProgress(id, totalPages, totalPages);
+    await progressTracker.saveToStorage();
+    
+    // Give a moment for the progress mutation to complete
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Then update library status to 'completed' in backend
+    try {
+      const result = await updateLibraryStatus({
+        variables: { 
+          bookId: id, 
+          status: 'completed' 
+        },
+      });
+      console.log('✅ Book marked as completed in library:', result);
+    } catch (error) {
+      console.error('❌ Error marking book as completed:', error);
     }
-    // Navigate back to book detail
-    navigate(`/book/${id}`);
+    
+    // Navigate back to source (home or library)
+    navigate(sourceRoute, { replace: true });
   };
 
   const handlePageChange = (newIndex: number) => {

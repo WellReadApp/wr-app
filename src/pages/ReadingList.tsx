@@ -39,7 +39,7 @@ const ReadingList = () => {
 
   const { data: libraryData, loading, error } = useQuery<LibraryData>(GET_USER_LIBRARY, {
     skip: !user,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
     errorPolicy: 'all',
   });
@@ -49,7 +49,11 @@ const ReadingList = () => {
   const savedBooks = libraryData?.get_library || [];
 
   // Get combined progress (server + local)
-  const getCombinedProgress = (bookId: string, serverProgress: number) => {
+  const getCombinedProgress = (bookId: string, serverProgress: number, status: string) => {
+    // If book is completed, always show 100% regardless of local progress
+    if (status === 'completed') {
+      return 100;
+    }
     const localProgress = progressTracker.getProgress(bookId);
     return Math.max(serverProgress || 0, localProgress?.progress || 0);
   };
@@ -155,7 +159,9 @@ const ReadingList = () => {
             const book = bookEntry.book;
             const progress = bookEntry.reading_progress;
             const serverProgress = progress?.progress || 0;
-            const progressValue = getCombinedProgress(book.id, serverProgress);
+            const bookStatus = bookEntry.status || 'want-to-read';
+            const progressValue = getCombinedProgress(book.id, serverProgress, bookStatus);
+            const isCompleted = bookStatus === 'completed';
             
             return (
               <div key={book.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
@@ -195,10 +201,14 @@ const ReadingList = () => {
                 </div>
                 <div className="flex gap-2">
                   <button 
-                    onClick={() => navigate(`/book/${book.id}/read`)} 
-                    className="flex-1 bg-[#E87968] text-white font-semibold py-2.5 rounded-full"
+                    onClick={() => navigate(`/book/${book.id}/read`, { state: { from: '/library' } })} 
+                    className={`flex-1 font-semibold py-2.5 rounded-full ${
+                      isCompleted
+                        ? 'bg-[#C8E6C9] text-[#2E7D32]'  // Light pastel green for completed
+                        : 'bg-[#E87968] text-white'
+                    }`}
                   >
-                    {progressValue >= 100 ? 'Read Again' : 
+                    {isCompleted ? 'Read Again' : 
                      progressValue > 0 ? 'Continue Reading' : 
                      'Start Reading'}
                   </button>

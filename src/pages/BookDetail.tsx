@@ -297,7 +297,8 @@ const BookDetail = () => {
   };
 
   const handleStartReading = () => {
-    navigate(`/book/${id}/read`);
+    // Pass the book detail page as source for navigation back
+    navigate(`/book/${id}/read`, { state: { from: `/book/${id}` } });
   };
 
   const handleStartListening = () => {

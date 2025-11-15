@@ -86,7 +86,7 @@ const Home = () => {
   // Get all books in user's library
   const { data: libraryData, loading: libraryLoading } = useQuery<any>(GET_USER_LIBRARY, {
     skip: !user,
-    fetchPolicy: 'cache-first',
+    fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
   });
 
@@ -123,7 +123,11 @@ const Home = () => {
   };
 
   // Get combined progress (server + local) - same as Reading List
-  const getCombinedProgress = (bookId: string, serverProgress: number) => {
+  const getCombinedProgress = (bookId: string, serverProgress: number, status: string) => {
+    // If book is completed, always show 100% regardless of local progress
+    if (status === 'completed') {
+      return 100;
+    }
     const localProgress = progressTracker.getProgress(bookId);
     return Math.max(serverProgress || 0, localProgress?.progress || 0);
   };
@@ -147,7 +151,9 @@ const Home = () => {
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
             {readingListBooks.map((entry: any) => {
               const serverProgress = entry.reading_progress?.progress || 0;
-              const progressValue = getCombinedProgress(entry.book.id, serverProgress);
+              const bookStatus = entry.status || 'want-to-read';
+              const progressValue = getCombinedProgress(entry.book.id, serverProgress, bookStatus);
+              const isCompleted = bookStatus === 'completed';
               
               return (
                 <div key={entry.book.id} className="flex-shrink-0 w-48 bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-2xl p-4 shadow-lg cursor-pointer" onClick={() => navigate(`/book/${entry.book.id}`)}>
@@ -186,12 +192,16 @@ const Home = () => {
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/book/${entry.book.id}/read`);
+                          navigate(`/book/${entry.book.id}/read`, { state: { from: '/' } });
                         }} 
-                        className="bg-white text-[#E87968] font-semibold py-2 px-4 rounded-full text-xs hover:shadow-md transition-all flex items-center gap-2 w-full justify-center"
+                        className={`font-semibold py-2 px-4 rounded-full text-xs hover:shadow-md transition-all flex items-center gap-2 w-full justify-center ${
+                          isCompleted 
+                            ? 'bg-[#C8E6C9] text-[#2E7D32]'  // Light pastel green for completed
+                            : 'bg-white text-[#E87968]'
+                        }`}
                       >
                         <PlayIcon size={12} fill="currentColor" />
-                        {progressValue >= 100 ? 'Read Again' : 
+                        {isCompleted ? 'Read Again' : 
                          progressValue > 0 ? 'Continue' : 
                          'Start Reading'}
                       </button>

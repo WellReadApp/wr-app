@@ -111,12 +111,14 @@ class ProgressTracker {
   // Sync progress with library
   private async syncWithLibrary(bookId: string, progress: number) {
     try {
-      // Determine status based on progress
+      // Determine status based on progress - but NEVER set to 'completed' automatically
+      // Only 'Mark as Read' button should set status to 'completed'
       let status = 'want-to-read';
       if (progress > 0 && progress < 100) {
         status = 'reading';
       } else if (progress >= 100) {
-        status = 'completed';
+        // Keep as 'reading' even at 100% - only Mark as Read button sets to 'completed'
+        status = 'reading';
       }
 
       // Check if book is already in library
@@ -134,31 +136,34 @@ class ProgressTracker {
         console.error('Failed to update reading progress:', progressError);
       }
 
-      // Update library status
+      // Update library status - only if not already completed
       try {
         if (bookInLibrary) {
-          await apolloClient.mutate({
-            mutation: UPDATE_LIBRARY_STATUS,
-            variables: { bookId, status },
-            update: (cache) => {
-              // Update relevant queries in cache instead of refetching
-              try {
-                // Update GET_USER_LIBRARY cache
-                const existingLibrary = cache.readQuery({ query: GET_USER_LIBRARY });
-                if (existingLibrary) {
-                  const updatedLibrary = (existingLibrary as any).get_library.map((item: any) => 
-                    item.book_id === bookId ? { ...item, status } : item
-                  );
-                  cache.writeQuery({
-                    query: GET_USER_LIBRARY,
-                    data: { get_library: updatedLibrary }
-                  });
+          // Don't override 'completed' status
+          if (bookInLibrary.status !== 'completed') {
+            await apolloClient.mutate({
+              mutation: UPDATE_LIBRARY_STATUS,
+              variables: { bookId, status },
+              update: (cache) => {
+                // Update relevant queries in cache instead of refetching
+                try {
+                  // Update GET_USER_LIBRARY cache
+                  const existingLibrary = cache.readQuery({ query: GET_USER_LIBRARY });
+                  if (existingLibrary) {
+                    const updatedLibrary = (existingLibrary as any).get_library.map((item: any) => 
+                      item.book_id === bookId ? { ...item, status } : item
+                    );
+                    cache.writeQuery({
+                      query: GET_USER_LIBRARY,
+                      data: { get_library: updatedLibrary }
+                    });
+                  }
+                } catch (cacheError) {
+                  // Cache update failed - not critical for functionality
                 }
-              } catch (cacheError) {
-                // Cache update failed - not critical for functionality
               }
-            }
-          });
+            });
+          }
         } else {
           await apolloClient.mutate({
             mutation: ADD_TO_LIBRARY,
