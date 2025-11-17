@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@apollo/client/react';
 import { SearchIcon, XIcon, BookOpenIcon } from 'lucide-react';
 import { SEARCH_BOOKS, LIST_POPULAR_BOOKS, LIST_RECENT_BOOKS } from '../services/bookQueries';
-import { collections, categories } from '../utils/mockData';
 import { useScrollToTop } from '../utils/useScrollToTop';
 
 // Types for book data
@@ -31,7 +30,6 @@ interface ListVars {
 const Search = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   // Scroll to top when navigating to this page
@@ -134,39 +132,10 @@ const Search = () => {
 
       {showDefaultView ? (
         <>
-          {/* Categories */}
-          <div className="mb-6">
-            <h2 className="text-lg font-bold text-[#333333] mb-3">Categories</h2>
-            <div className="flex flex-wrap gap-2">
-              <button 
-                onClick={() => setSelectedCategory(null)} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  !selectedCategory ? 'bg-[#E87968] text-white' : 'bg-white border border-gray-200 text-[#333333]'
-                }`}
-              >
-                All
-              </button>
-              {categories.map(category => (
-                <button 
-                  key={category} 
-                  onClick={() => setSelectedCategory(category)} 
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    selectedCategory === category ? 'bg-[#E87968] text-white' : 'bg-white border border-gray-200 text-[#333333]'
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Popular Section */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-[#333333]">Popular</h2>
-              <button className="text-[#E87968] text-sm font-semibold">
-                More
-              </button>
             </div>
             {popularError ? (
               <div className="text-center py-8">
@@ -206,9 +175,6 @@ const Search = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-[#333333]">Latest</h2>
-              <button className="text-[#E87968] text-sm font-semibold">
-                More
-              </button>
             </div>
             {recentLoading ? (
               <div className="flex gap-4 overflow-x-auto pb-2">
@@ -239,9 +205,6 @@ const Search = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-[#333333]">Trending</h2>
-              <button className="text-[#E87968] text-sm font-semibold">
-                More
-              </button>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {trendingBooks.slice(0, 10).map(book => (
@@ -251,41 +214,6 @@ const Search = () => {
                     {book.title}
                   </h4>
                   <p className="text-xs text-gray-500 mb-2">{book.primary_author_name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Collections Section - Keep as is since not supported in graph */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-[#333333]">Collections</h2>
-              <button className="text-[#E87968] text-sm font-semibold">
-                More
-              </button>
-            </div>
-            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-              {collections.map(collection => (
-                <div key={collection.id} className="flex-shrink-0 w-36 cursor-pointer">
-                  {/* Stacked Books Visual - Mock for now */}
-                  <div className="relative w-full h-48 mb-3">
-                    <div 
-                      className="absolute w-full h-48 bg-[#E87968] rounded-xl shadow-md"
-                      style={{ left: '0px', top: '0px', zIndex: 1 }}
-                    />
-                    <div 
-                      className="absolute w-full h-48 bg-[#F7B8A1] rounded-xl shadow-md"
-                      style={{ left: '8px', top: '4px', zIndex: 2 }}
-                    />
-                    <div 
-                      className="absolute w-full h-48 bg-[#333333] rounded-xl shadow-md"
-                      style={{ left: '16px', top: '8px', zIndex: 3 }}
-                    />
-                  </div>
-                  <h3 className="font-semibold text-sm text-[#333333] mb-1 line-clamp-2">
-                    {collection.title}
-                  </h3>
-                  <p className="text-xs text-gray-500">{collection.description}</p>
                 </div>
               ))}
             </div>

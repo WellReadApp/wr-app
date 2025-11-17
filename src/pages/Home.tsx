@@ -241,9 +241,6 @@ const Home = () => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#333333]">For You</h2>
-          <button className="text-[#E87968] text-sm font-semibold">
-            More
-          </button>
         </div>
         <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {popularLoading && <p className="text-sm text-gray-500">Loading…</p>}
@@ -277,17 +274,6 @@ const Home = () => {
               <p className="text-xs text-gray-500 mb-2">{book.primary_author_name}</p>
             </div>
           ))}
-        </div>
-      </div>
-      {/* Categories */}
-      <div className="mb-6">
-        <h2 className="text-xl font-bold text-[#333333] mb-4">
-          Popular Topics
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {categories.map(category => <button key={category} className="px-4 py-2 bg-white border border-[#F7B8A1] text-[#333333] rounded-full text-sm font-medium hover:bg-[#F7B8A1] hover:text-white transition-colors">
-              {category}
-            </button>)}
         </div>
       </div>
       {/* Recently Added (real data) */}
