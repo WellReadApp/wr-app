@@ -32,27 +32,23 @@ Your PWA now has a robust auto-update system that prevents the blank screen issu
 
 ## How It Works
 
-### Update Flow
+### Automatic Update Flow
 1. **User visits app** → Service worker checks for updates automatically
 2. **New version detected** → New service worker installs in background
-3. **Installation complete** → Update notification appears with "Update Now" button
-4. **User clicks "Update Now"** → 
-   - Sends `SKIP_WAITING` message to waiting service worker
-   - Service worker activates immediately
-   - Page reloads automatically with new version
-5. **User clicks "Later"** → 
-   - Notification dismisses
-   - Update will happen automatically when app is closed and reopened
+3. **Installation complete** → App automatically activates new version and reloads
+4. **User sees fresh content** → No interaction needed, seamless update!
 
-### Automatic Updates (if "Later" is clicked)
-- When user closes the app completely
-- Next time they open the app, the new version is already active
-- No notification needed, updates seamlessly
+### What Users Experience
+- **No notifications** - Updates happen silently in background
+- **Automatic reload** - Page refreshes automatically (takes ~1 second)
+- **Latest version** - Always running the newest code
+- **Zero disruption** - Happens so fast users barely notice
 
 ### Automatic Checks
 - On page load
 - Every 60 seconds (background check)
 - When service worker detects a new version
+- Instant activation and reload when found
 
 ### Caching Strategy
 - **Navigation requests**: Network-first (always try to get latest HTML/JS)
@@ -104,10 +100,11 @@ git push origin main
 - Old caches are automatically cleaned up
 - Service worker activates immediately
 
-### ✅ User-Friendly Updates
-- Clear notification when updates are available
-- User controls when to update
-- Smooth transition without data loss
+### ✅ Seamless Updates
+- No user interaction required
+- Automatic reload when new version detected
+- Updates happen in background
+- Fast transition (~1 second)
 
 ### ✅ Automatic Version Management
 - Each build gets unique version number
@@ -139,15 +136,18 @@ git push origin main
 ## Console Logs to Watch For
 
 ```
-[SW] Registered successfully, scope: /
-[SW] Update found, installing new version...
-[SW] New worker state: installing
-[SW] New worker state: installed
-[SW] New version installed, ready to activate
-[SW] Activating new service worker, version: 1764156504081
-[SW] Deleting old cache: wellread-v1764155123456-static
-[SW] Controller changed, new version active
-✅ Service worker versioned: 1764156504081
+[Update] Checking for updates...
+[Update] New service worker found, state: installing
+[Update] Service worker state changed to: installed
+[Update] New version installed, auto-updating...
+[Update] Auto-activating new version...
+[SW] Received SKIP_WAITING message, activating new version
+[SW] Activating new service worker, version: 1764172650130
+[SW] Deleting old cache: wellread-v1764172036998-static
+[SW] Deleting old cache: wellread-v1764172036998-runtime
+[Update] Reloading to apply update
+// Page reloads automatically
+✅ Service worker versioned: 1764172650130
 ```
 
 ## Best Practices
@@ -159,9 +159,10 @@ git push origin main
 4. Keep an eye on user reports for first 24 hours
 
 ### For Users
-- Click "Update Now" when notification appears
-- Don't ignore updates for too long (features may break)
-- If you see a blank screen, reload the page once
+- Updates happen automatically - no action needed
+- App may refresh briefly when updates are applied
+- This is normal and ensures you always have the latest features
+- If experiencing issues, try closing and reopening the app
 
 ### Development
 - Test update flow before each deployment
