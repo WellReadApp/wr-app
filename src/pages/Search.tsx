@@ -113,7 +113,7 @@ const Search = () => {
 
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
-      <h1 className="text-3xl font-bold text-[#333333] mb-6">Discover</h1>
+      <h1 className="text-3xl font-bold text-[#333333] mb-6">Search</h1>
       
       {/* Search Bar */}
       <div className="relative mb-6">

@@ -17,7 +17,7 @@ const BottomNav = () => {
   {
     path: '/search',
     icon: SearchIcon,
-    label: 'Discover'
+    label: 'Search'
   }, {
     path: '/reading-list',
     icon: BookmarkIcon,
