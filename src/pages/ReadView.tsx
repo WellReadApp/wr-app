@@ -186,15 +186,27 @@ const ReadView = () => {
 
       {/* Content */}
       <div className="px-6 py-8 min-h-[60vh]">
-        {error && <p className="text-red-500 text-sm">Failed to load summary.</p>}
-        {loading && <p className="text-gray-500">Loading summary…</p>}
-        {!loading && !error && totalPages > 0 && (
+        {error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500 text-sm">Failed to load summary.</p>
+          </div>
+        ) : loading ? (
+          <div className="space-y-4">
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6" />
+          </div>
+        ) : totalPages > 0 ? (
           <div className={`${fontSizes[fontSize]} text-gray-700 leading-relaxed whitespace-pre-line`}>
             {pages[currentPageIndex].content}
           </div>
-        )}
-        {!loading && !error && totalPages === 0 && (
-          <p className="text-gray-500">No summary pages available.</p>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No summary pages available.</p>
+          </div>
         )}
       </div>
 

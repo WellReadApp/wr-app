@@ -242,13 +242,27 @@ const Home = () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#333333]">For You</h2>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {popularLoading && <p className="text-sm text-gray-500">Loading…</p>}
-          {popularError && <p className="text-sm text-red-500">Failed to load.</p>}
-          {!popularLoading && !popularError && popularData?.list_popular_books?.length === 0 && (
-            <p className="text-sm text-gray-500">No popular books available.</p>
-          )}
-          {!popularLoading && !popularError && popularData?.list_popular_books?.map(book => (
+        {popularLoading ? (
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-36">
+                <div className="w-full h-48 bg-gray-200 rounded-xl animate-pulse mb-3" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : popularError ? (
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-2">Failed to load.</p>
+          </div>
+        ) : popularData?.list_popular_books?.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No popular books available.</p>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {popularData?.list_popular_books?.map(book => (
             <div
               key={book.id}
               onClick={() => navigate(`/book/${book.id}`)}
@@ -274,20 +288,35 @@ const Home = () => {
               <p className="text-xs text-gray-500 mb-2">{book.primary_author_name}</p>
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </div>
       {/* Recently Added (real data) */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-[#333333]">Recently Added</h2>
         </div>
-        <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {recentLoading && <p className="text-sm text-gray-500">Loading…</p>}
-          {recentError && <p className="text-sm text-red-500">Failed to load.</p>}
-          {!recentLoading && !recentError && recentData?.list_recent_books?.length === 0 && (
-            <p className="text-sm text-gray-500">No recent books.</p>
-          )}
-          {!recentLoading && !recentError && recentData?.list_recent_books?.map(book => (
+        {recentLoading ? (
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-shrink-0 w-36">
+                <div className="w-full h-48 bg-gray-200 rounded-xl animate-pulse mb-3" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-2" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
+              </div>
+            ))}
+          </div>
+        ) : recentError ? (
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-2">Failed to load.</p>
+          </div>
+        ) : recentData?.list_recent_books?.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No recent books.</p>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+          {recentData?.list_recent_books?.map(book => (
             <div
               key={book.id}
               onClick={() => navigate(`/book/${book.id}`)}
@@ -313,7 +342,8 @@ const Home = () => {
               <p className="text-xs text-gray-500 mb-2">{book.primary_author_name}</p>
             </div>
           ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>;
 };

@@ -340,10 +340,22 @@ const BookDetail = () => {
 
       {/* Content */}
       <div className="px-4 py-6">
-        {loading && <p className="text-gray-500">Loading book…</p>}
-        {error && <p className="text-red-500 text-sm">Failed to load book.</p>}
-        
-        {book && (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-32 h-48 bg-gray-200 rounded-xl animate-pulse mx-auto" />
+              <div className="w-3/4 max-w-md space-y-3">
+                <div className="h-6 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-2/3" />
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+              </div>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500 text-sm">Failed to load book.</p>
+          </div>
+        ) : book ? (
           <>
             {/* Book Info */}
             <div className="flex gap-4 mb-6">
@@ -414,29 +426,21 @@ const BookDetail = () => {
               <h3 className="text-lg font-bold text-[#333333] mb-3">
                 Key Takeaways
               </h3>
-              {loading ? (
-                <p className="text-gray-500">Loading key takeaways...</p>
-              ) : error ? (
-                <div className="text-red-500">
-                  <p>Error loading data: {error.message}</p>
-                </div>
-              ) : book ? (
-                book.key_points.length > 0 ? (
-                  <div className="space-y-3">
-                    {book.key_points.map((keyPoint, index) => (
-                      <div key={keyPoint.id} className="flex gap-3">
-                        <div className="w-6 h-6 rounded-full bg-[#E87968] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                          {index + 1}
-                        </div>
-                        <p className="text-gray-600 leading-relaxed">{keyPoint.point}</p>
+              {book.key_points.length > 0 ? (
+                <div className="space-y-3">
+                  {book.key_points.map((keyPoint, index) => (
+                    <div key={keyPoint.id} className="flex gap-3">
+                      <div className="w-6 h-6 rounded-full bg-[#E87968] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
+                        {index + 1}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No key takeaways available for this book.</p>
-                )
+                      <p className="text-gray-600 leading-relaxed">{keyPoint.point}</p>
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <p className="text-gray-500">Book not found</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No key takeaways available for this book.</p>
+                </div>
               )}
             </div>
 
@@ -445,9 +449,7 @@ const BookDetail = () => {
               <h3 className="text-lg font-bold text-[#333333] mb-3">
                 Flashcard Quotes
               </h3>
-              {loading ? (
-                <p className="text-gray-500">Loading quotes...</p>
-              ) : book.quotes.length > 0 ? (
+              {book.quotes.length > 0 ? (
                 <div className="mt-2">
                   <InlineFlashcards quotes={book.quotes.map(quote => ({
                     text: quote.text,
@@ -455,11 +457,13 @@ const BookDetail = () => {
                   }))} />
                 </div>
               ) : (
-                <p className="text-gray-500">No quotes available for this book.</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No quotes available for this book.</p>
+                </div>
               )}
             </div>
           </>
-        )}
+        ) : null}
       </div>
 
       {/* Audio Player */}

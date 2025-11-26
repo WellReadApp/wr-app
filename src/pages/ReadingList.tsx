@@ -117,7 +117,18 @@ const ReadingList = () => {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-[#333333] mb-2">Library</h1>
         </div>
-        <p className="text-gray-500">Loading your books...</p>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex gap-3 bg-white p-3 rounded-xl shadow-sm border border-gray-100">
+              <div className="w-16 h-24 bg-gray-200 rounded-lg animate-pulse flex-shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
