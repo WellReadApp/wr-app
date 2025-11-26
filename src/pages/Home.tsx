@@ -63,6 +63,26 @@ const Home = () => {
   
   // Scroll to top when navigating to this page
   useScrollToTop();
+
+  // Get time-based greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return 'Good morning';
+    } else if (hour >= 12 && hour < 17) {
+      return 'Good afternoon';
+    } else {
+      return 'Good evening';
+    }
+  };
+
+  // Get user's first name from email (before @)
+  const getUserFirstName = () => {
+    if (!user?.email) return 'Reader';
+    const emailName = user.email.split('@')[0];
+    // Capitalize first letter
+    return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+  };
   
   const { data: recentData, loading: recentLoading, error: recentError } = useQuery<RecentBooksData, RecentBooksVars>(LIST_RECENT_BOOKS, {
     variables: { limit: 15, offset: 0 },
@@ -141,7 +161,9 @@ const Home = () => {
   return <div className="max-w-md mx-auto px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-[#333333] mb-1">WellRead</h1>
+        <h1 className="text-3xl font-bold text-[#333333] mb-1">
+          {getGreeting()}, {getUserFirstName()}
+        </h1>
         <p className="text-gray-500">Ready to grow today?</p>
       </div>
       {/* Reading List Resume Scroll */}
