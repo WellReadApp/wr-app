@@ -6,6 +6,7 @@ import { AuthProvider } from './utils/AuthContext';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { preloadCriticalData } from './utils/cacheUtils';
 import PWAInstallationGate from './components/PWAInstallationGate';
+import { UpdateNotification } from './components/UpdateNotification';
 import Home from './pages/Home';
 import BookDetail from './pages/BookDetail';
 import ReadView from './pages/ReadView';
@@ -124,6 +125,7 @@ export function App() {
       <BrowserRouter>
         <AuthProvider>
           <AppErrorBoundary>
+            <UpdateNotification />
             <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
