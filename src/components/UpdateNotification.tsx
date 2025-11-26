@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 export const UpdateNotification: React.FC = () => {
   const [showUpdate, setShowUpdate] = useState(false);
-  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+  const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
 
   useEffect(() => {
     // Check if service worker is supported
@@ -10,68 +10,98 @@ export const UpdateNotification: React.FC = () => {
       return;
     }
 
-    // Get the current registration
-    navigator.serviceWorker.getRegistration().then((reg) => {
-      if (reg) {
-        // Check if there's an update waiting
-        if (reg.waiting) {
-          setRegistration(reg);
-          setShowUpdate(true);
-        }
-
-        // Listen for new updates
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                setRegistration(reg);
-                setShowUpdate(true);
-              }
-            });
-          }
-        });
+    // Function to check for waiting service worker
+    const checkForWaitingWorker = (reg: ServiceWorkerRegistration) => {
+      if (reg.waiting) {
+        console.log('[Update] Found waiting service worker');
+        setWaitingWorker(reg.waiting);
+        setShowUpdate(true);
       }
+    };
+
+    // Get current registration and check for updates
+    navigator.serviceWorker.getRegistration().then((reg) => {
+      if (!reg) return;
+
+      // Check immediately
+      checkForWaitingWorker(reg);
+
+      // Listen for new service worker installing
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        console.log('[Update] New service worker found, state:', newWorker?.state);
+
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            console.log('[Update] Service worker state changed to:', newWorker.state);
+            
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker is installed and there's an active controller
+              console.log('[Update] New version ready to activate');
+              setWaitingWorker(newWorker);
+              setShowUpdate(true);
+            }
+          });
+        }
+      });
+    });
+
+    // Listen for controller change (when new SW takes over)
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      console.log('[Update] Controller changed, new service worker active');
     });
 
     // Listen for messages from service worker
-    navigator.serviceWorker.addEventListener('message', (event) => {
-      if (event.data && event.data.type === 'SW_UPDATED') {
-        navigator.serviceWorker.getRegistration().then((reg) => {
-          if (reg) {
-            setRegistration(reg);
-            setShowUpdate(true);
-          }
-        });
+    const messageHandler = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'RELOAD_PAGE') {
+        console.log('[Update] Received reload message from service worker');
+        window.location.reload();
       }
-    });
+    };
+    navigator.serviceWorker.addEventListener('message', messageHandler);
 
-    // Check for updates periodically (every 60 seconds)
+    // Check for updates every 60 seconds
     const interval = setInterval(() => {
       navigator.serviceWorker.getRegistration().then((reg) => {
         if (reg) {
+          console.log('[Update] Checking for updates...');
           reg.update();
         }
       });
     }, 60000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      navigator.serviceWorker.removeEventListener('message', messageHandler);
+    };
   }, []);
 
   const handleUpdate = () => {
-    if (registration && registration.waiting) {
-      // Tell the service worker to skip waiting
-      registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-      
-      // Reload the page after a short delay to let the new SW take control
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+    if (!waitingWorker) {
+      console.warn('[Update] No waiting worker found');
+      return;
     }
+
+    console.log('[Update] Activating new service worker');
+    
+    // Send skip waiting message to the waiting service worker
+    waitingWorker.postMessage({ type: 'SKIP_WAITING' });
+    
+    // Hide the notification
+    setShowUpdate(false);
+    
+    // The service worker will send a RELOAD_PAGE message when ready
+    // If it doesn't work, fallback to reload after 1 second
+    setTimeout(() => {
+      console.log('[Update] Fallback reload');
+      window.location.reload();
+    }, 1000);
   };
 
   const handleDismiss = () => {
+    console.log('[Update] User dismissed update notification');
     setShowUpdate(false);
+    // Don't set waitingWorker to null - keep it so we can update later
   };
 
   if (!showUpdate) {
@@ -84,7 +114,7 @@ export const UpdateNotification: React.FC = () => {
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
             <svg 
-              className="w-6 h-6 text-blue-500" 
+              className="w-6 h-6 text-[#E87968]" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
@@ -102,18 +132,18 @@ export const UpdateNotification: React.FC = () => {
               Update Available
             </h3>
             <p className="text-sm text-gray-600 mb-3">
-              A new version of WellRead is available. Update now to get the latest features and fixes.
+              A new version of WellRead is available. Tap "Update Now" to get the latest features.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={handleUpdate}
-                className="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-[#E87968] text-white text-sm font-medium rounded-lg hover:bg-[#D96858] transition-colors active:scale-95"
               >
                 Update Now
               </button>
               <button
                 onClick={handleDismiss}
-                className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors active:scale-95"
               >
                 Later
               </button>

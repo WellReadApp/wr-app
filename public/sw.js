@@ -13,7 +13,7 @@ const urlsToCache = [
   '/icons/icon-512x512.png'
 ];
 
-// Install service worker and skip waiting
+// Install service worker - DON'T skip waiting immediately
 self.addEventListener('install', (event) => {
   console.log('[SW] Installing new service worker, version:', CACHE_VERSION);
   event.waitUntil(
@@ -22,11 +22,8 @@ self.addEventListener('install', (event) => {
         console.log('[SW] Precaching static assets');
         return cache.addAll(urlsToCache);
       })
-      .then(() => {
-        // Force the waiting service worker to become the active service worker
-        return self.skipWaiting();
-      })
   );
+  // Don't skip waiting here - let the user decide when to update
 });
 
 // Fetch event - Network first, fallback to cache
@@ -126,17 +123,21 @@ self.addEventListener('activate', (event) => {
 // Send message to clients when service worker is updated
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('[SW] Received SKIP_WAITING message, activating new version');
     self.skipWaiting();
   }
 });
 
-// Notify clients when a new version is available
+// When the service worker takes control, notify clients to reload
+let refreshing = false;
 self.addEventListener('controllerchange', () => {
-  self.clients.matchAll().then((clients) => {
+  if (refreshing) return;
+  refreshing = true;
+  console.log('[SW] Controller changed, reloading all clients');
+  self.clients.matchAll({ type: 'window' }).then((clients) => {
     clients.forEach((client) => {
       client.postMessage({
-        type: 'SW_UPDATED',
-        message: 'A new version is available!'
+        type: 'RELOAD_PAGE'
       });
     });
   });
