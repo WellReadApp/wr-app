@@ -11,7 +11,7 @@ export const GET_BOOK = gql`
       picture_url
       first_publish_year
       readinglog_count
-      status
+      type
       library_status {
         user_id
         book_id
@@ -34,6 +34,26 @@ export const GET_BOOK = gql`
       key_points {
         id
         point
+        order_index
+      }
+      book_themes {
+        id
+        title
+        description
+      }
+      enjoyment_criteria {
+        id
+        criteria
+        order_index
+      }
+      actionable_benefits {
+        id
+        benefit
+        order_index
+      }
+      contrasting_viewpoints {
+        id
+        viewpoint
         order_index
       }
     }

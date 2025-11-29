@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeftIcon, BookmarkIcon, ShareIcon, Volume2Icon, StarIcon } from 'lucide-react';
+import { ArrowLeftIcon, BookmarkIcon, ShareIcon, Volume2Icon } from 'lucide-react';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { GET_BOOK } from '../services/bookQueries';
 import { 
@@ -23,7 +23,7 @@ interface BookData {
     picture_url: string | null;
     first_publish_year: number | null;
     readinglog_count: number | null;
-    status: string | null;
+    type: string | null;
     library_status: {
       user_id: string;
       book_id: string;
@@ -48,6 +48,26 @@ interface BookData {
       point: string;
       order_index: number | null;
     }[];
+    book_themes: {
+      id: string;
+      title: string;
+      description: string;
+    }[];
+    enjoyment_criteria: {
+      id: string;
+      criteria: string;
+      order_index: number | null;
+    }[];
+    actionable_benefits: {
+      id: string;
+      benefit: string;
+      order_index: number | null;
+    }[];
+    contrasting_viewpoints: {
+      id: string;
+      viewpoint: string;
+      order_index: number | null;
+    }[];
   };
 }
 
@@ -60,6 +80,8 @@ const BookDetail = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [localProgress, setLocalProgress] = useState<number>(0);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState<'about' | 'keypoints' | 'quotes'>('about');
+  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
 
   // Scroll to top when navigating to this page or when book ID changes
   useScrollToTop([id]);
@@ -302,7 +324,8 @@ const BookDetail = () => {
   };
 
   const handleStartListening = () => {
-    setIsPlaying(true);
+    // Coming soon feature
+    setShowComingSoonModal(true);
   };
 
   // Get quotes and key points from the main book data
@@ -371,16 +394,13 @@ const BookDetail = () => {
                   {book.title}
                 </h1>
                 <p className="text-gray-600 mb-4">{book.primary_author_name}</p>
-                <div className="flex items-center gap-2 mb-3">
-                  {book.readinglog_count !== null && (
-                    <div className="flex items-center gap-1">
-                      <StarIcon size={16} className="text-[#F59E0B] fill-[#F59E0B]" />
-                      <span className="text-sm font-semibold text-[#333333]">
-                        {book.readinglog_count} reads
-                      </span>
-                    </div>
-                  )}
-                </div>
+                {book.type && (
+                  <div className="mb-3">
+                    <span className="inline-block px-3 py-1 bg-[#E87968]/10 text-[#E87968] text-sm font-medium rounded-full">
+                      {book.type}
+                    </span>
+                  </div>
+                )}
                 {book.first_publish_year && (
                   <div className="text-sm text-gray-500">
                     Published: {book.first_publish_year}
@@ -409,56 +429,172 @@ const BookDetail = () => {
               </button>
             </div>
 
-            {/* Description */}
-            {book.description && (
-              <div className="mb-6">
-                <h3 className="text-lg font-bold text-[#333333] mb-3">
-                  About this book
-                </h3>
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                  {book.description}
-                </p>
-              </div>
-            )}
-
-            {/* Key Takeaways */}
+            {/* Tabs */}
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-[#333333] mb-3">
-                Key Takeaways
-              </h3>
-              {book.key_points.length > 0 ? (
-                <div className="space-y-3">
-                  {book.key_points.map((keyPoint, index) => (
-                    <div key={keyPoint.id} className="flex gap-3">
-                      <div className="w-6 h-6 rounded-full bg-[#E87968] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
-                        {index + 1}
-                      </div>
-                      <p className="text-gray-600 leading-relaxed">{keyPoint.point}</p>
+              <div className="flex border-b border-gray-200 mb-6">
+                <button
+                  onClick={() => setActiveTab('about')}
+                  className={`flex-1 py-3 px-4 text-center font-semibold transition-all ${
+                    activeTab === 'about'
+                      ? 'text-[#E87968] border-b-2 border-[#E87968]'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => setActiveTab('keypoints')}
+                  className={`flex-1 py-3 px-4 text-center font-semibold transition-all ${
+                    activeTab === 'keypoints'
+                      ? 'text-[#E87968] border-b-2 border-[#E87968]'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Key Points
+                </button>
+                <button
+                  onClick={() => setActiveTab('quotes')}
+                  className={`flex-1 py-3 px-4 text-center font-semibold transition-all ${
+                    activeTab === 'quotes'
+                      ? 'text-[#E87968] border-b-2 border-[#E87968]'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Quotes
+                </button>
+              </div>
+
+              {/* About Tab */}
+              {activeTab === 'about' && (
+                <div>
+                  {/* Description */}
+                  {book.description && (
+                    <div className="mb-6">
+                      <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                        {book.description}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No key takeaways available for this book.</p>
+                  )}
+
+                  {/* Enjoyment Criteria */}
+                  {book.enjoyment_criteria && book.enjoyment_criteria.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-bold text-[#333333] mb-3">
+                        You'll enjoy this book if
+                      </h3>
+                      <div className="space-y-2">
+                        {book.enjoyment_criteria.map((item) => (
+                          <div key={item.id} className="flex gap-2 items-start">
+                            <span className="text-[#E87968] text-xl font-bold mt-0.5">•</span>
+                            <p className="text-gray-600 leading-relaxed flex-1">
+                              {item.criteria}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actionable Benefits */}
+                  {book.actionable_benefits && book.actionable_benefits.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-bold text-[#333333] mb-3">
+                        This book can help you
+                      </h3>
+                      <div className="space-y-2">
+                        {book.actionable_benefits.map((item) => (
+                          <div key={item.id} className="flex gap-2 items-start">
+                            <span className="text-[#E87968] text-xl font-bold mt-0.5">•</span>
+                            <p className="text-gray-600 leading-relaxed flex-1">
+                              {item.benefit}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Book Themes */}
+                  {book.book_themes && book.book_themes.length > 0 && (
+                    <div className="mb-6">
+                      <div className="flex flex-wrap gap-2">
+                        {book.book_themes.map((theme) => (
+                          <span 
+                            key={theme.id}
+                            className="inline-block px-3 py-1.5 bg-[#F7B8A1]/20 text-[#E87968] text-sm font-medium rounded-full border border-[#E87968]/20"
+                          >
+                            {theme.title}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
 
-            {/* Inline Flashcards */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-[#333333] mb-3">
-                Flashcard Quotes
-              </h3>
-              {book.quotes.length > 0 ? (
-                <div className="mt-2">
-                  <InlineFlashcards quotes={book.quotes.map(quote => ({
-                    text: quote.text,
-                    author: quote.author || undefined
-                  }))} />
+              {/* Key Points Tab */}
+              {activeTab === 'keypoints' && (
+                <div>
+                  {/* Key Takeaways */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-bold text-[#333333] mb-3">
+                      Key Takeaways
+                    </h3>
+                    {book.key_points.length > 0 ? (
+                      <div className="space-y-2">
+                        {book.key_points.map((keyPoint) => (
+                          <div key={keyPoint.id} className="flex gap-2 items-start">
+                            <span className="text-[#E87968] text-xl font-bold mt-0.5">•</span>
+                            <p className="text-gray-600 leading-relaxed flex-1">{keyPoint.point}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">No key takeaways available for this book.</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Contrasting Viewpoints */}
+                  {book.contrasting_viewpoints && book.contrasting_viewpoints.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="text-lg font-bold text-[#333333] mb-3">
+                        Contrasting Viewpoints
+                      </h3>
+                      <div className="space-y-2">
+                        {book.contrasting_viewpoints.map((item) => (
+                          <div key={item.id} className="flex gap-2 items-start">
+                            <span className="text-[#E87968] text-xl font-bold mt-0.5">•</span>
+                            <p className="text-gray-600 leading-relaxed flex-1">
+                              {item.viewpoint}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No quotes available for this book.</p>
+              )}
+
+              {/* Quotes Tab */}
+              {activeTab === 'quotes' && (
+                <div>
+                  {/* Inline Flashcards */}
+                  <div className="mb-6">
+                    {book.quotes.length > 0 ? (
+                      <div className="mt-2">
+                        <InlineFlashcards quotes={book.quotes.map(quote => ({
+                          text: quote.text,
+                          author: quote.author || undefined
+                        }))} />
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500">No quotes available for this book.</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -472,6 +608,36 @@ const BookDetail = () => {
           bookTitle={book.title} 
           onClose={() => setIsPlaying(false)} 
         />
+      )}
+
+      {/* Coming Soon Modal */}
+      {showComingSoonModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/30 backdrop-blur-sm">
+          <div className="bg-gradient-to-br from-[#FCF8F5] to-[#FFF5F0] rounded-2xl shadow-2xl max-w-sm w-full p-6 border-2 border-[#F7B8A1]/30">
+            <div className="flex flex-col items-center text-center">
+              {/* Icon */}
+              <div className="w-16 h-16 bg-gradient-to-br from-[#F7B8A1] to-[#E87968] rounded-full flex items-center justify-center mb-4">
+                <Volume2Icon className="text-white" size={28} />
+              </div>
+              
+              {/* Message */}
+              <h3 className="text-xl font-bold text-[#333333] mb-2">
+                Coming Soon! 🎧
+              </h3>
+              <p className="text-gray-600 leading-relaxed mb-6">
+                Hope you enjoy reading the summaries, stay tuned, we will add the audio version soon :)
+              </p>
+              
+              {/* Close Button */}
+              <button
+                onClick={() => setShowComingSoonModal(false)}
+                className="w-full bg-gradient-to-r from-[#F7B8A1] to-[#E87968] text-white font-semibold py-3 rounded-xl shadow-md hover:shadow-lg transition-all"
+              >
+                Got it!
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
