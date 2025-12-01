@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, TypeIcon, CheckCircleIcon } from 'lucide-react';
 import { useQuery, useMutation } from '@apollo/client/react';
@@ -25,6 +25,7 @@ const ReadView = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [fontSize, setFontSize] = useState<'small' | 'base' | 'large' | 'xlarge'>('base');
   const [isInitialized, setIsInitialized] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   
   // Track where user came from (home or library)
   const sourceRoute = (location.state as any)?.from || '/';
@@ -139,6 +140,13 @@ const ReadView = () => {
 
   const handlePageChange = (newIndex: number) => {
     setCurrentPageIndex(newIndex);
+    // Scroll to top of content when changing pages
+    if (contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Fallback: scroll window to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     // Progress is automatically updated via useEffect
   };
 
@@ -185,7 +193,7 @@ const ReadView = () => {
       </div>
 
       {/* Content */}
-      <div className="px-6 py-8 min-h-[60vh]">
+      <div ref={contentRef} className="px-6 py-8 pb-28 min-h-[60vh]">
         {error ? (
           <div className="text-center py-12">
             <p className="text-red-500 text-sm">Failed to load summary.</p>
