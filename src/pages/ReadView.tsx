@@ -23,7 +23,11 @@ const ReadView = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [fontSize, setFontSize] = useState<'small' | 'base' | 'large' | 'xlarge'>('base');
+  const [fontSize, setFontSize] = useState<'small' | 'base' | 'large' | 'xlarge'>(() => {
+    // Load saved font preference from localStorage
+    const saved = localStorage.getItem('readview-font-size');
+    return (saved as 'small' | 'base' | 'large' | 'xlarge') || 'base';
+  });
   const [isInitialized, setIsInitialized] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   
@@ -106,7 +110,10 @@ const ReadView = () => {
   const cycleFont = () => {
     const order: Array<'small' | 'base' | 'large' | 'xlarge'> = ['small', 'base', 'large', 'xlarge'];
     const idx = order.indexOf(fontSize);
-    setFontSize(order[(idx + 1) % order.length]);
+    const newFontSize = order[(idx + 1) % order.length];
+    setFontSize(newFontSize);
+    // Save font preference to localStorage
+    localStorage.setItem('readview-font-size', newFontSize);
   };
 
   const handleMarkAsDone = async () => {
